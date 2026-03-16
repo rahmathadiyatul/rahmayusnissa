@@ -300,9 +300,9 @@ export default function WeddingClient({
                         >
                             BUKA UNDANGAN
                         </button>
-                        <p className="mt-5 text-[11px] text-[var(--text-muted)] tracking-wider">
+                        {/* <p className="mt-5 text-[11px] text-[var(--text-muted)] tracking-wider">
                             Musik otomatis diputar
-                        </p>
+                        </p> */}
                     </div>
                 </section>
             )}

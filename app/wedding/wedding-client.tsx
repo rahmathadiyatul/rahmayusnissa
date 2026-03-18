@@ -301,7 +301,7 @@ export default function WeddingClient({
     // }
 
     return (
-        <main className="relative min-h-screen overflow-x-hidden bg-particles pb-24">
+        <main className="relative min-h-screen overflow-x-hidden bg-particles pb-24 select-none">
             <audio ref={audioRef} loop preload="none" src="/audio/theme.mp3" />
 
             {/* Envelope Section */}
@@ -494,18 +494,31 @@ export default function WeddingClient({
                         </article>
                     </div>
 
-                    <div className="mt-12 text-center">
-                        <a
-                            href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Resepsi+Pernikahan+Ica+%26+Afdal&dates=20260404T010000Z/20260404T070000Z&details=Turut+mengundang+Bapak/Ibu/Saudara/i+pada+acara+resepsi+kami.&location=Lubuk+Sikarah,+Solok"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-display inline-block rounded-full border border-[rgba(212,175,55,0.6)] bg-[rgba(212,175,55,0.15)] px-8 py-3.5 text-xs tracking-[0.3em] text-[var(--accent-gold)] transition hover:bg-[rgba(212,175,55,0.25)] hover:scale-[1.02] active:scale-95 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
-                        >
-                            SIMPAN KE KALENDER
-                        </a>
-                        <p className="mt-4 text-[11px] text-[var(--text-muted)] tracking-widest uppercase">
-                            Catat Tanggalnya
-                        </p>
+                    <div className="mt-10 flex flex-col items-center gap-4">
+                        <div className="flex w-full flex-col justify-center gap-4 sm:flex-row">
+                            <a
+                                href="https://maps.app.goo.gl/bYQMUNQDWyHQrBBQA"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-display flex w-full items-center justify-center gap-2 rounded-full border border-[rgba(212,175,55,0.6)] bg-[rgba(212,175,55,0.15)] px-6 py-3.5 text-xs tracking-[0.2em] text-[var(--accent-gold)] transition hover:bg-[rgba(212,175,55,0.25)] hover:scale-[1.02] active:scale-95 shadow-[0_0_15px_rgba(212,175,55,0.15)] sm:w-auto"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="currentColor" />
+                                </svg>
+                                BUKA GOOGLE MAPS
+                            </a>
+                            <a
+                                href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Resepsi+Pernikahan+Ica+%26+Afdal&dates=20260404T010000Z/20260404T070000Z&details=Turut+mengundang+Bapak/Ibu/Saudara/i+pada+acara+resepsi+kami.&location=Lubuk+Sikarah,+Solok"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-display flex w-full items-center justify-center gap-2 rounded-full border border-[rgba(184,188,198,0.4)] bg-[rgba(184,188,198,0.05)] px-6 py-3.5 text-xs tracking-[0.2em] silver-text transition hover:bg-[rgba(184,188,198,0.15)] hover:scale-[1.02] active:scale-95 sm:w-auto"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 4H18V2H16V4H8V2H6V4H5C3.89 4 3.01 4.9 3.01 6L3 20C3 21.1 3.89 22 5 22H19C20.1 22 21 21.1 21 20V6C21 4.9 20.1 4 19 4ZM19 20H5V10H19V20ZM19 8H5V6H19V8Z" fill="currentColor" />
+                                </svg>
+                                SIMPAN KALENDER
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -616,7 +629,7 @@ export default function WeddingClient({
                             <div className="absolute top-0 right-0 w-24 h-24 bg-[rgba(212,175,55,0.05)] rounded-bl-full"></div>
                             <p className="font-display gold-text tracking-widest text-xl mb-2 font-bold select-none">Bank BRI</p>
                             <div className="flex items-center justify-center gap-3 my-3">
-                                <p className="text-md tracking-[0.2em] silver-text font-mono font-medium">5547 0102 4151 533</p>
+                                <p className="text-md tracking-[0.2em] silver-text font-mono font-medium select-all">5547 0102 4151 533</p>
                                 <button
                                     onClick={() => copyToClipboard("554701024151533")}
                                     className="relative z-50 p-1.5 rounded-md hover:bg-[rgba(212,175,55,0.15)] transition-colors active:scale-95"

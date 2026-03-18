@@ -85,9 +85,9 @@ export default function WeddingClient({
             : [
                 {
                     id: "1",
-                    name: "Keluarga Besar",
-                    message: "Semoga menjadi keluarga sakinah, mawaddah, warahmah.",
-                    createdAt: "Baru saja",
+                    name: "Bang Adi Tercinta",
+                    message: "Semoga menjadi keluarga sakinah, mawaddah, warahmah. Punya anak banyak!",
+                    createdAt: "Hari ini",
                 },
             ],
     );

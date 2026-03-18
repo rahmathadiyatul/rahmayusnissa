@@ -20,7 +20,7 @@ const alexBrush = Alex_Brush({
 });
 
 export const metadata: Metadata = {
-  title: "Undangan Pernikahan Ica & Afdal",
+  title: "Ica & Afdal | Wedding",
   description: "Undangan pernikahan digital Ica dan Afdal",
 };
 

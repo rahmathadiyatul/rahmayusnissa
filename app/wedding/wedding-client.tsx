@@ -44,7 +44,7 @@ const galleryImages = [
     "/images/wedding-7.jpeg",
     "/images/wedding-8.jpeg",
     "/images/wedding-9.jpeg",
-    "/images/wedding-10.jpeg",
+    // "/images/wedding-10.jpeg",
     "/images/wedding-11.jpeg",
     "/images/wedding-12.jpeg",
     "/images/wedding-13.jpeg",
@@ -285,7 +285,9 @@ export default function WeddingClient({
 
                     <div className="glass-card reveal w-full max-w-md rounded-3xl px-6 py-12 text-center sm:px-10 border border-[rgba(212,175,55,0.4)] shadow-[0_0_30px_rgba(212,175,55,0.1)]">
                         <p className="font-display silver-text text-xs tracking-[0.34em] uppercase">Undangan Pernikahan</p>
-                        <h1 className="font-script mt-6 text-6xl leading-none gold-text drop-shadow-md">Ica & Afdal</h1>
+                        <h1 className="font-script mt-6 text-7xl leading-none gold-text drop-shadow-md text-start ml-16">Ica</h1>
+                        <h1 className="font-script text-3xl leading-none gold-text drop-shadow-md">&</h1>
+                        <h1 className="font-script text-7xl leading-none gold-text drop-shadow-md text-end mr-10">Afdal</h1>
                         <p className="mt-5 text-lg silver-text font-serif">Sabtu, 4 April 2026</p>
                         <div className="mt-8 mb-8 section-divider w-24"></div>
                         <p className="text-sm text-[var(--text-muted)]">
@@ -316,17 +318,19 @@ export default function WeddingClient({
             </button>
 
             {/* Hero Section */}
-            <section className={`relative w-full h-[100vh] min-h-[600px] flex flex-col items-center justify-center text-center px-4 overflow-hidden mb-16 transition-opacity duration-[1500ms] ${opened ? 'opacity-100' : 'opacity-0'}`}>
+            <section className={`relative w-full h-[100vh] min-h-[600px] flex flex-col items-center justify-start text-center px-4 overflow-hidden mb-16 transition-opacity duration-[1500ms] ${opened ? 'opacity-100' : 'opacity-0'}`}>
                 <div className="absolute inset-0 z-[-1]">
-                    <Image src="/images/wedding-4.jpeg" alt="Hero Background" fill className="object-cover opacity-[0.45] block md:hidden" priority />
-                    <Image src="/images/wedding-5.jpeg" alt="Hero Background" fill className="object-cover opacity-[0.45] hidden md:block" priority />
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#0b0b0c]/10 via-[#0b0b0c]/40 to-[#0b0b0c]"></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b0c] via-transparent to-transparent h-48 bottom-0"></div>
+                    <Image src="/images/wedding-19.jpeg" alt="Hero Background" fill className="object-cover opacity-[0.45] block md:hidden" priority />
+                    <Image src="/images/home.jpeg" alt="Hero Background" fill className="object-cover opacity-[0.45] hidden md:block" priority />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#0b0b0c]/20 via-[#0b0b0c]/0 to-[#0b0b0c]/90"></div>
+                    {/* <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b0c] via-transparent to-transparent h-48 bottom-0"></div> */}
                 </div>
 
-                <div className="reveal relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center pt-20">
+                <div className="reveal relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center mt-10 sm:items-end sm:mt-10">
                     <p className="font-display silver-text text-[11px] tracking-[0.4em] sm:text-xs uppercase drop-shadow-md">The Wedding Of</p>
-                    <h2 className="font-script mt-6 text-7xl leading-none gold-text sm:text-8xl drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">Ica & Afdal</h2>
+                    <h2 className="font-script mt-6 text-7xl leading-none gold-text sm:text-8xl drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">Ica</h2>
+                    <h2 className="font-script text-2xl leading-none gold-text sm:text-3xl drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">&</h2>
+                    <h2 className="font-script text-7xl leading-none gold-text sm:text-8xl drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">Afdal</h2>
                     <p className="font-display mt-8 text-sm tracking-[0.25em] silver-text sm:text-base drop-shadow-md uppercase">
                         Sabtu, 4 April 2026
                     </p>
@@ -365,29 +369,35 @@ export default function WeddingClient({
                     <h3 className="font-display text-center text-xs tracking-[0.3em] silver-text uppercase mb-10">Mempelai</h3>
 
                     <div className="grid gap-10 sm:grid-cols-2 relative z-10">
-                        {/* Bride */}
-                        <article className="flex flex-col items-center text-center group">
-                            <div className="relative h-72 w-full max-w-[240px] rounded-t-full rounded-b-xl overflow-hidden border border-[rgba(212,175,55,0.4)] shadow-[0_0_25px_rgba(212,175,55,0.15)] transition duration-700 group-hover:scale-[1.02]">
-                                <Image src="/images/wedding-15.jpeg" alt="Ica" fill className="object-cover" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            </div>
-                            <p className="font-script mt-6 text-5xl gold-text">Ica</p>
-                            <p className="mt-3 text-[15px] silver-text font-bold tracking-wide">Rahma Yus Nissa, S.Pt</p>
-                            <p className="mt-3 text-sm text-[var(--text-muted)] leading-relaxed max-w-[280px]">
-                                Putri ke-4 dari <br />Bapak (alm) H. Yusmin RB <br />& Ibu Betmawati
-                            </p>
-                        </article>
-
                         {/* Groom */}
-                        <article className="flex flex-col items-center text-center group mt-8 sm:mt-0">
+                        <article className="flex flex-col items-center text-center group mt-8 sm:mt-0 order-2 sm:order-1">
                             <div className="relative h-72 w-full max-w-[240px] rounded-t-full rounded-b-xl overflow-hidden border border-[rgba(184,188,198,0.4)] shadow-[0_0_25px_rgba(184,188,198,0.1)] transition duration-700 group-hover:scale-[1.02]">
-                                <Image src="/images/wedding-21.jpeg" alt="Afdal" fill className="object-cover" />
+                                <Image
+                                    src="/images/afdal.jpeg"
+                                    alt="Afdal"
+                                    fill
+                                    className="object-cover transform scale-265 transition-transform duration-700"
+                                    style={{ objectPosition: '100% 40%' }}
+                                />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             </div>
                             <p className="font-script mt-6 text-5xl gold-text">Afdal</p>
                             <p className="mt-3 text-[15px] silver-text font-bold tracking-wide">Afdal Rahmadhani</p>
                             <p className="mt-3 text-sm text-[var(--text-muted)] leading-relaxed max-w-[280px]">
                                 Putra ke-4 dari <br />Bapak Eman <br />& Ibu Nurhayani
+                            </p>
+                        </article>
+
+                        {/* Bride */}
+                        <article className="flex flex-col items-center text-center group order-1 sm:order-2">
+                            <div className="relative h-72 w-full max-w-[240px] rounded-t-full rounded-b-xl overflow-hidden border border-[rgba(212,175,55,0.4)] shadow-[0_0_25px_rgba(212,175,55,0.15)] transition duration-700 group-hover:scale-[1.02]">
+                                <Image src="/images/ica.jpeg" alt="Ica" fill className="object-cover" style={{ objectPosition: '100% 0%' }} />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            </div>
+                            <p className="font-script mt-6 text-5xl gold-text">Ica</p>
+                            <p className="mt-3 text-[15px] silver-text font-bold tracking-wide">Rahma Yus Nissa, S.Pt</p>
+                            <p className="mt-3 text-sm text-[var(--text-muted)] leading-relaxed max-w-[280px]">
+                                Putri ke-4 dari <br />Bapak (alm) H. Yusmin RB <br />& Ibu Betmawati
                             </p>
                         </article>
                     </div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cinzel, Cormorant_Garamond, Great_Vibes } from "next/font/google";
+import { Cinzel, Cormorant_Garamond, Alex_Brush } from "next/font/google";
 import "./globals.css";
 
 const cinzel = Cinzel({
@@ -13,8 +13,8 @@ const cormorant = Cormorant_Garamond({
   weight: ["400", "500", "600", "700"],
 });
 
-const greatVibes = Great_Vibes({
-  variable: "--font-great-vibes",
+const alexBrush = Alex_Brush({
+  variable: "--font-alex-brush",
   subsets: ["latin"],
   weight: ["400"],
 });
@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body
-        className={`${cinzel.variable} ${cormorant.variable} ${greatVibes.variable} antialiased`}
+        className={`${cinzel.variable} ${cormorant.variable} ${alexBrush.variable} antialiased`}
       >
         {children}
       </body>

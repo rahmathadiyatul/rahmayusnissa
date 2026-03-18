@@ -39,9 +39,6 @@ a {
 
 .font-script {
   font-family: var(--font-alex-brush), cursive;
-  /* Make the script font look thicker */
-  -webkit-text-stroke: 1px currentColor;
-  text-shadow: 0 0 1px currentColor;
 }
 
 .glass-card {

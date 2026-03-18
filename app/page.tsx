@@ -3,7 +3,7 @@ export default function Home() {
     <main className="relative flex min-h-screen items-center justify-center px-6 py-10">
       <section className="glass-card w-full max-w-xl rounded-3xl px-6 py-10 text-center sm:px-10">
         <p className="font-display text-sm tracking-[0.28em] silver-text">UNDANGAN DIGITAL</p>
-        <h1 className="font-display mt-4 text-4xl leading-tight text-white sm:text-5xl">
+        <h1 className="font-script mt-4 text-4xl leading-tight text-white sm:text-5xl">
           Ica <span className="gold-text">&</span> Afdal
         </h1>
         <p className="mt-5 text-lg silver-text">Sabtu, 4 April 2026</p>

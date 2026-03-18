@@ -67,16 +67,25 @@ a {
 .gold-text {
   background: linear-gradient(to right,
       #a67c00 0%,
-      #bf953f 20%,
-      #fcf6ba 40%,
-      #b38728 60%,
-      #fbf5b7 80%,
-      #a67c00 100%);
+      #bf953f 15%,
+      #fcf6ba 30%,
+      #b38728 50%,
+      #fbf5b7 65%,
+      #a67c00 80%,
+      #fcf6ba 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: #bf953f;
   filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.4));
+  animation: shine 4s linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
 }
 
 .silver-text {
@@ -135,6 +144,70 @@ a {
   100% {
     transform: translateY(0) translateX(0);
   }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 6s linear infinite;
+}
+
+.animate-spin-slow.paused {
+  animation-play-state: paused;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInOverlay 0.3s ease-out forwards;
+}
+
+@keyframes zoomInImage {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-zoom-in {
+  animation: zoomInImage 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes breatheSection {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+.animate-breathe {
+  animation: breatheSection 8s ease-in-out infinite;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

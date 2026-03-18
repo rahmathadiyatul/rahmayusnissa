@@ -41,7 +41,7 @@ const galleryImages = [
     "/images/wedding-2.jpeg",
     "/images/wedding-3.jpeg",
     "/images/wedding-6.jpeg",
-    "/images/wedding-7.jpeg",
+    "/images/wedding-4.jpeg",
     "/images/wedding-8.jpeg",
     "/images/wedding-9.jpeg",
     // "/images/wedding-10.jpeg",
@@ -97,6 +97,35 @@ export default function WeddingClient({
     const [giftSender, setGiftSender] = useState("");
     const [giftAmount, setGiftAmount] = useState("");
     const [giftStatus, setGiftStatus] = useState("");
+    const [copied, setCopied] = useState(false);
+
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    const copyToClipboard = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy!', err);
+        }
+    };
+
+    useEffect(() => {
+        // Force scroll to top when page loads/refreshes
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+
+        // Prevent body scroll when envelope is closed
+        if (!opened) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [opened]);
 
     useEffect(() => {
         const id = window.setInterval(() => {
@@ -246,30 +275,30 @@ export default function WeddingClient({
         }
     };
 
-    if (!isAllowed) {
-        return (
-            <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-particles px-6 py-10">
-                <section className="glass-card w-full max-w-md rounded-3xl px-6 py-10 text-center sm:px-10">
-                    <p className="font-display text-xs tracking-[0.34em] silver-text">AKSES UNDANGAN</p>
-                    <h1 className="font-script mt-5 text-5xl leading-none gold-text">Ica & Afdal</h1>
-                    <p className="mt-6 text-base silver-text">
-                        {inviteeUuid
-                            ? "ID undangan tidak terdaftar atau nonaktif."
-                            : "ID undangan tidak ditemukan."}
-                    </p>
-                    <p className="mt-3 text-sm text-[var(--text-muted)]">
-                        Mohon gunakan tautan resmi yang dikirimkan kepada Anda.
-                    </p>
-                    <Link
-                        href="/"
-                        className="font-display mt-8 inline-flex w-full items-center justify-center rounded-full border border-[rgba(212,175,55,0.65)] bg-[rgba(212,175,55,0.15)] px-6 py-3 text-xs tracking-[0.22em] text-[var(--accent-gold)] transition hover:bg-[rgba(212,175,55,0.24)]"
-                    >
-                        KEMBALI
-                    </Link>
-                </section>
-            </main>
-        );
-    }
+    // if (!isAllowed) {
+    //     return (
+    //         <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-particles px-6 py-10">
+    //             <section className="glass-card w-full max-w-md rounded-3xl px-6 py-10 text-center sm:px-10">
+    //                 <p className="font-display text-xs tracking-[0.34em] silver-text">AKSES UNDANGAN</p>
+    //                 <h1 className="font-script mt-5 text-5xl leading-none gold-text">Ica & Afdal</h1>
+    //                 <p className="mt-6 text-base silver-text">
+    //                     {inviteeUuid
+    //                         ? "ID undangan tidak terdaftar atau nonaktif."
+    //                         : "ID undangan tidak ditemukan."}
+    //                 </p>
+    //                 <p className="mt-3 text-sm text-[var(--text-muted)]">
+    //                     Mohon gunakan tautan resmi yang dikirimkan kepada Anda.
+    //                 </p>
+    //                 <Link
+    //                     href="/"
+    //                     className="font-display mt-8 inline-flex w-full items-center justify-center rounded-full border border-[rgba(212,175,55,0.65)] bg-[rgba(212,175,55,0.15)] px-6 py-3 text-xs tracking-[0.22em] text-[var(--accent-gold)] transition hover:bg-[rgba(212,175,55,0.24)]"
+    //                 >
+    //                     KEMBALI
+    //                 </Link>
+    //             </section>
+    //         </main>
+    //     );
+    // }
 
     return (
         <main className="relative min-h-screen overflow-x-hidden bg-particles pb-24">
@@ -290,10 +319,12 @@ export default function WeddingClient({
                         <h1 className="font-script text-7xl leading-none gold-text drop-shadow-md text-end mr-10">Afdal</h1>
                         <p className="mt-5 text-lg silver-text font-serif">Sabtu, 4 April 2026</p>
                         <div className="mt-8 mb-8 section-divider w-24"></div>
-                        <p className="text-sm text-[var(--text-muted)]">
-                            Kepada Yth.
-                        </p>
-                        <p className="mt-1 text-xl font-bold silver-text">{inviteeDisplay}</p>
+                        <div className="mx-auto max-w-[280px] rounded-xl border border-[rgba(212,175,55,0.3)] bg-[rgba(10,10,12,0.6)] py-4 backdrop-blur-sm shadow-[0_4px_15px_rgba(0,0,0,0.5)]">
+                            <p className="text-[11px] uppercase tracking-widest text-[var(--text-muted)]">
+                                Kepada Yth. Bpk/Ibu/Saudara/i
+                            </p>
+                            <p className="mt-2 text-xl font-bold silver-text drop-shadow-md px-4">{inviteeDisplay}</p>
+                        </div>
 
                         <button
                             type="button"
@@ -312,9 +343,20 @@ export default function WeddingClient({
             <button
                 type="button"
                 onClick={toggleMusic}
-                className="font-display fixed bottom-5 right-4 z-40 rounded-full border border-[rgba(212,175,55,0.4)] bg-[rgba(14,14,16,0.9)] px-4 py-2 text-[10px] tracking-[0.2em] text-[var(--accent-gold)] shadow-lg backdrop-blur-md transition hover:bg-[rgba(30,30,35,0.9)]"
+                className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(212,175,55,0.4)] bg-[rgba(14,14,16,0.9)] text-[var(--accent-gold)] shadow-[0_0_15px_rgba(212,175,55,0.3)] backdrop-blur-md transition-transform hover:scale-110 active:scale-95"
+                title={musicOn ? "Matikan Musik" : "Putar Musik"}
             >
-                {musicOn ? "MUSIK ON" : "MUSIK OFF"}
+                <div className={`flex h-full w-full items-center justify-center rounded-full border border-dashed border-[rgba(212,175,55,0.4)] animate-spin-slow ${musicOn ? "" : "paused"}`}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 14.5C10.62 14.5 9.5 13.38 9.5 12C9.5 10.62 10.62 9.5 12 9.5C13.38 9.5 14.5 10.62 14.5 12C14.5 13.38 13.38 14.5 12 14.5ZM12 8C9.79 8 8 9.79 8 12C8 14.21 9.79 16 12 16C14.21 16 16 14.21 16 12C16 9.79 14.21 8 12 8Z" />
+                        <circle cx="12" cy="12" r="1.5" fill="#141418" />
+                    </svg>
+                </div>
+                {!musicOn && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="h-6 w-0.5 rotate-45 bg-[rgba(212,175,55,0.8)] shadow-[0_0_5px_rgba(0,0,0,1)]"></div>
+                    </div>
+                )}
             </button>
 
             {/* Hero Section */}
@@ -341,7 +383,7 @@ export default function WeddingClient({
             </section>
 
             {/* Save the Date Countdown */}
-            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20 relative z-10">
+            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20 relative z-10 animate-breathe">
                 <div className="glass-card reveal delay-1 rounded-3xl px-5 py-12 text-center sm:px-12 border-t border-[rgba(212,175,55,0.2)]">
                     <p className="font-display text-xs tracking-[0.3em] silver-text uppercase">Menuju Hari Bahagia</p>
                     <div className="mt-8 grid grid-cols-4 gap-3 sm:gap-6 max-w-2xl mx-auto">
@@ -361,7 +403,7 @@ export default function WeddingClient({
             </section>
 
             {/* Couple Section */}
-            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20">
+            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20 animate-breathe">
                 <div className="glass-card reveal delay-1 rounded-3xl px-5 py-12 sm:px-12 relative overflow-hidden">
                     <div className="absolute -top-24 -right-24 w-48 h-48 bg-[rgba(212,175,55,0.1)] rounded-full blur-3xl"></div>
                     <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[rgba(184,188,198,0.1)] rounded-full blur-3xl"></div>
@@ -405,7 +447,7 @@ export default function WeddingClient({
             </section>
 
             {/* Quote Section */}
-            <section className="relative mx-auto max-w-5xl px-4 sm:px-6 mb-20">
+            <section className="relative mx-auto max-w-5xl px-4 sm:px-6 mb-20 animate-breathe" style={{ animationDelay: '1s' }}>
                 <div className="glass-card reveal delay-2 relative overflow-hidden rounded-3xl px-6 py-20 text-center sm:px-12 border-none">
                     <div className="absolute inset-0 z-0">
                         <Image src="/images/wedding-14.jpeg" alt="Quote Background" fill className="object-cover opacity-[0.25]" />
@@ -423,7 +465,7 @@ export default function WeddingClient({
             </section>
 
             {/* Event Details */}
-            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20">
+            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20 animate-breathe" style={{ animationDelay: '2s' }}>
                 <div className="glass-card reveal delay-2 rounded-3xl px-5 py-12 sm:px-12">
                     <h3 className="font-display text-center text-xs tracking-[0.3em] silver-text uppercase mb-10">Rangkaian Acara</h3>
                     <div className="grid gap-6 sm:grid-cols-2">
@@ -451,18 +493,36 @@ export default function WeddingClient({
                             </p>
                         </article>
                     </div>
+
+                    <div className="mt-12 text-center">
+                        <a
+                            href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Resepsi+Pernikahan+Ica+%26+Afdal&dates=20260404T010000Z/20260404T070000Z&details=Turut+mengundang+Bapak/Ibu/Saudara/i+pada+acara+resepsi+kami.&location=Lubuk+Sikarah,+Solok"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-display inline-block rounded-full border border-[rgba(212,175,55,0.6)] bg-[rgba(212,175,55,0.15)] px-8 py-3.5 text-xs tracking-[0.3em] text-[var(--accent-gold)] transition hover:bg-[rgba(212,175,55,0.25)] hover:scale-[1.02] active:scale-95 shadow-[0_0_15px_rgba(212,175,55,0.15)]"
+                        >
+                            SIMPAN KE KALENDER
+                        </a>
+                        <p className="mt-4 text-[11px] text-[var(--text-muted)] tracking-widest uppercase">
+                            Catat Tanggalnya
+                        </p>
+                    </div>
                 </div>
             </section>
 
             {/* Gallery Section */}
-            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20">
+            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20 animate-breathe" style={{ animationDelay: '3s' }}>
                 <div className="glass-card reveal delay-3 rounded-3xl px-5 py-12 sm:px-10">
                     <h3 className="font-display text-center text-xs tracking-[0.3em] silver-text uppercase mb-10">Momen Bahagia</h3>
 
                     {/* Masonry Layout fallback using CSS columns */}
                     <div className="columns-2 sm:columns-3 gap-4">
                         {galleryImages.map((src, idx) => (
-                            <div key={idx} className="relative break-inside-avoid mb-4 overflow-hidden rounded-xl border border-[rgba(184,188,198,0.2)] group bg-[#151518]">
+                            <div
+                                key={idx}
+                                className="relative break-inside-avoid mb-4 overflow-hidden rounded-xl border border-[rgba(184,188,198,0.2)] group bg-[#151518] cursor-pointer"
+                                onClick={() => setSelectedImage(src)}
+                            >
                                 <Image
                                     src={src}
                                     alt={`Gallery image ${idx + 1}`}
@@ -478,7 +538,7 @@ export default function WeddingClient({
             </section>
 
             {/* RSVP */}
-            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20">
+            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20 animate-breathe" style={{ animationDelay: '4s' }}>
                 <div className="glass-card reveal delay-2 rounded-3xl px-5 py-12 sm:px-12 relative overflow-hidden">
                     <h3 className="font-display text-center text-xs tracking-[0.3em] silver-text uppercase mb-8">Konfirmasi Kehadiran</h3>
                     <form onSubmit={submitRsvp} className="mx-auto max-w-lg space-y-6 relative z-10">
@@ -488,7 +548,7 @@ export default function WeddingClient({
                                 value={rsvpName}
                                 onChange={(e) => setRsvpName(e.target.value)}
                                 className="w-full rounded-xl border border-[rgba(184,188,198,0.2)] bg-[rgba(10,10,12,0.8)] px-5 py-3.5 text-white placeholder-[rgba(184,188,198,0.4)] outline-none focus:border-[rgba(212,175,55,0.7)] transition-colors focus:bg-[rgba(20,20,24,0.9)]"
-                                placeholder="Contoh: Budi Santoso"
+                                placeholder="Contoh: Rahma Yus Nissa"
                             />
                         </label>
 
@@ -544,7 +604,7 @@ export default function WeddingClient({
             </section>
 
             {/* Gift */}
-            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20">
+            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20 animate-breathe" style={{ animationDelay: '5s' }}>
                 <div className="glass-card reveal delay-3 rounded-3xl px-5 py-12 text-center sm:px-12 relative">
                     <h3 className="font-display text-xs tracking-[0.3em] silver-text uppercase">Tanda Kasih</h3>
                     <p className="mt-6 text-[15px] silver-text max-w-xl mx-auto leading-relaxed">
@@ -552,15 +612,33 @@ export default function WeddingClient({
                     </p>
 
                     <div className="mt-8 space-y-4 text-[15px]">
-                        <div className="inline-block p-5 rounded-xl border border-[rgba(212,175,55,0.2)] bg-[rgba(10,10,12,0.6)] min-w-[280px]">
-                            <p className="font-display gold-text tracking-widest text-lg mb-1">BCA</p>
-                            <p className="text-xl tracking-widest silver-text font-mono my-2">1234 5678 90</p>
-                            <p className="text-sm text-[var(--text-muted)]">a.n. Rahma Yus Nissa</p>
-                        </div>
-                        <div className="inline-block p-5 rounded-xl border border-[rgba(184,188,198,0.2)] bg-[rgba(10,10,12,0.6)] min-w-[280px]">
-                            <p className="font-display silver-text tracking-widest text-lg mb-1">BRI</p>
-                            <p className="text-xl tracking-widest silver-text font-mono my-2">9876 5432 10</p>
-                            <p className="text-sm text-[var(--text-muted)]">a.n. Afdal Rahmadhani</p>
+                        <div className="inline-block p-6 rounded-xl border border-[rgba(212,175,55,0.3)] bg-[rgba(10,10,12,0.8)] min-w-[300px] shadow-[0_0_15px_rgba(212,175,55,0.05)] relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-[rgba(212,175,55,0.05)] rounded-bl-full"></div>
+                            <p className="font-display gold-text tracking-widest text-xl mb-2 font-bold select-none">Bank BRI</p>
+                            <div className="flex items-center justify-center gap-3 my-3">
+                                <p className="text-md tracking-[0.2em] silver-text font-mono font-medium">5547 0102 4151 533</p>
+                                <button
+                                    onClick={() => copyToClipboard("554701024151533")}
+                                    className="relative z-50 p-1.5 rounded-md hover:bg-[rgba(212,175,55,0.15)] transition-colors active:scale-95"
+                                    title="Salin Nomor Rekening"
+                                >
+                                    {copied ? (
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M20 6L9 17l-5-5" stroke="#d4af37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    ) : (
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M8 4V16a2 2 0 002 2h10a2 2 0 002-2V4a2 2 0 00-2-2H10a2 2 0 00-2 2zM4 8v12a2 2 0 002 2h10" stroke="#b8bcc6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    )}
+                                </button>
+                            </div>
+                            <p className="text-sm text-[var(--text-muted)] mt-1 select-none">a.n. Rahma Yus Nissa</p>
+
+                            {/* Copied Toast */}
+                            <div className={`absolute top-2 right-1/2 translate-x-1/2 bg-[rgba(212,175,55,0.9)] text-[#0b0b0c] px-3 py-1 rounded-full text-[10px] font-bold tracking-wider transition-all duration-300 ${copied ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-4'}`}>
+                                BERHASIL DISALIN
+                            </div>
                         </div>
                     </div>
 
@@ -600,7 +678,7 @@ export default function WeddingClient({
             </section>
 
             {/* Wishes */}
-            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20">
+            <section className="mx-auto max-w-5xl px-4 sm:px-6 mb-20 animate-breathe" style={{ animationDelay: '6s' }}>
                 <div className="glass-card reveal delay-3 rounded-3xl px-5 py-12 sm:px-12">
                     <h3 className="font-display text-center text-xs tracking-[0.3em] silver-text uppercase mb-8">Ucapan & Doa</h3>
                     <form onSubmit={submitWish} className="mx-auto max-w-xl space-y-4">
@@ -643,7 +721,7 @@ export default function WeddingClient({
             </section>
 
             {/* Closing */}
-            <section className="relative mx-auto mt-20 max-w-5xl px-4 pb-20 sm:px-6">
+            <section className="relative mx-auto mt-20 max-w-5xl px-4 pb-20 sm:px-6 animate-breathe" style={{ animationDelay: '7s' }}>
                 <div className="glass-card reveal delay-3 relative overflow-hidden rounded-3xl px-5 py-24 text-center sm:px-12 border-none">
                     <div className="absolute inset-0 z-0">
                         <Image src="/images/wedding-17.jpeg" alt="Closing Background" fill className="object-cover opacity-[0.25]" />
@@ -661,6 +739,38 @@ export default function WeddingClient({
                     </div>
                 </div>
             </section>
+
+            {/* Image Preview Modal */}
+            {selectedImage && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm transition-opacity animate-fade-in"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <button
+                        className="absolute top-6 right-6 z-10 text-white hover:text-[var(--accent-gold)] transition-colors p-2"
+                        onClick={() => setSelectedImage(null)}
+                        aria-label="Close image preview"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div
+                        className="relative flex items-center justify-center p-1 sm:p-1.5 rounded-xl shadow-[0_0_40px_rgba(212,175,55,0.25)] animate-zoom-in"
+                        style={{ background: 'linear-gradient(135deg, #a67c00 0%, #bf953f 20%, #fcf6ba 40%, #b38728 60%, #fbf5b7 80%, #a67c00 100%)' }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="bg-[#0b0b0c] p-1.5 sm:p-2.5 rounded-lg overflow-hidden flex items-center justify-center border border-black/50">
+                            <img
+                                src={selectedImage}
+                                alt="Preview"
+                                className="max-w-[90vw] max-h-[85vh] object-contain rounded shadow-inner"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

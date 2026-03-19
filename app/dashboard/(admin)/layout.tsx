@@ -6,21 +6,21 @@ export default function DashboardLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="min-h-screen bg-black text-gray-200 flex flex-col font-sans">
-            <header className="border-b border-gray-800 sticky top-0 bg-black z-10">
+        <div className="min-h-screen bg-[#f8f9fa] text-gray-800 flex flex-col font-sans">
+            <header className="border-b border-[rgba(212,175,55,0.2)] sticky top-0 bg-white/80 backdrop-blur-md z-20 shadow-sm">
                 <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-white tracking-widest">DASHBOARD</h1>
+                    <h1 className="text-xl font-bold font-display text-[var(--accent-gold)] tracking-[0.2em] uppercase">DASHBOARD</h1>
                     <form action={logout}>
                         <button
                             type="submit"
-                            className="text-sm px-4 py-2 border border-gray-700 rounded hover:bg-zinc-900 transition-colors"
+                            className="text-sm px-5 py-2 border border-gray-300 rounded-full text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors tracking-wide"
                         >
                             Logout
                         </button>
                     </form>
                 </div>
             </header>
-            <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
+            <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
                 {children}
             </main>
         </div>

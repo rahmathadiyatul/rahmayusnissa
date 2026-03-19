@@ -165,29 +165,34 @@ Wassalamu'alaikum Warahmatullahi Wabarakatuh.`
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Top Bar */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center sm:sticky sm:top-16 bg-black py-4 z-10">
-                <input
-                    type="text"
-                    placeholder="Search by name..."
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    className="w-full sm:max-w-xs bg-zinc-900 border border-gray-800 rounded px-4 py-2 text-white focus:outline-none focus:border-gray-500"
-                />
-                <div className="flex gap-2 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center sm:sticky sm:top-16 bg-[#f8f9fa] py-4 z-10">
+                <div className="relative w-full sm:max-w-xs">
+                    <input
+                        type="text"
+                        placeholder="Search by name..."
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="w-full bg-white border border-gray-200 shadow-sm rounded-full pl-11 pr-4 py-3 text-base text-gray-800 focus:outline-none focus:border-[rgba(212,175,55,0.5)] focus:ring-1 focus:ring-[rgba(212,175,55,0.5)] transition-all"
+                    />
+                    <svg className="w-5 h-5 text-gray-400 absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <div className="flex gap-3 w-full sm:w-auto">
                     <button
                         onClick={() => handleOpenModal()}
-                        className="flex-1 sm:flex-none bg-white text-black px-4 py-2 rounded font-medium hover:bg-gray-200 transition-colors"
+                        className="flex-1 sm:flex-none font-display text-xs tracking-[0.2em] font-bold bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.4)] text-[var(--accent-gold-dark)] px-6 py-3 rounded-full hover:bg-[rgba(212,175,55,0.2)] transition-colors shadow-sm uppercase flex items-center justify-center gap-1.5"
                     >
-                        + Add
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                        TAMBAH
                     </button>
                     {('contacts' in navigator && 'ContactsManager' in window) && (
                         <button
                             onClick={handleImportContacts}
-                            className="flex-1 sm:flex-none border border-gray-700 text-white px-4 py-2 rounded font-medium hover:bg-zinc-800 transition-colors"
+                            className="flex-1 sm:flex-none font-display text-xs tracking-[0.2em] font-bold bg-white border border-gray-300 text-gray-600 px-5 py-3 rounded-full hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm uppercase flex items-center justify-center gap-1.5"
                         >
-                            Import Contacts
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            IMPORT KONTAK
                         </button>
                     )}
                 </div>
@@ -197,97 +202,99 @@ Wassalamu'alaikum Warahmatullahi Wabarakatuh.`
             <div className="grid gap-4 sm:hidden">
                 {/* Mobile Cards */}
                 {filteredInvitees.map(inv => (
-                    <div key={inv.id} className="bg-zinc-900 border border-gray-800 rounded-lg p-4 space-y-4">
+                    <div key={inv.id} className="bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 rounded-2xl p-6 space-y-5">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h3 className="font-bold text-white text-lg">{inv.full_name}</h3>
+                                <h3 className="font-bold text-gray-900 text-xl">{inv.full_name}</h3>
                                 {inv.display_name && inv.display_name !== inv.full_name && (
-                                    <p className="text-sm text-gray-400">({inv.display_name})</p>
+                                    <p className="text-base text-gray-500">({inv.display_name})</p>
                                 )}
-                                <p className="text-sm text-gray-400 mt-1">Pax: {inv.max_pax}</p>
+                                <p className="text-sm text-gray-400 mt-1 uppercase tracking-wider font-semibold">Pax: {inv.max_pax}</p>
                             </div>
                             <button
                                 onClick={() => handleToggleSent(inv.id, inv.is_sent)}
-                                className={`px-3 py-1 rounded-full text-xs font-semibold ${inv.is_sent ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'
+                                className={`px-4 py-2 rounded-full text-xs uppercase tracking-wider font-bold border transition-colors ${inv.is_sent ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100'
                                     }`}
                             >
-                                {inv.is_sent ? 'Sent' : 'Not Sent'}
+                                {inv.is_sent ? 'Terkirim' : 'Belum'}
                             </button>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 text-sm">
-                            <button onClick={() => handleOpenModal(inv)} className="bg-zinc-800 hover:bg-zinc-700 px-3 py-2 rounded text-white flex-1 text-center">
+                        <div className="flex flex-wrap gap-2 text-xs font-bold tracking-wider uppercase">
+                            <button onClick={() => handleOpenModal(inv)} className="bg-gray-50 border border-gray-200 hover:bg-gray-100 px-4 py-3 rounded-lg text-gray-600 flex-1 text-center transition-colors">
                                 Edit
                             </button>
                             {inv.phone && (
-                                <a href={getWaLink(inv)} target="_blank" rel="noreferrer" className="bg-green-700 hover:bg-green-600 px-3 py-2 rounded text-white flex-1 text-center">
+                                <a href={getWaLink(inv)} target="_blank" rel="noreferrer" className="bg-[#25D366]/10 border border-[#25D366]/30 hover:bg-[#25D366]/20 px-4 py-3 rounded-lg text-[#25D366] flex-1 text-center transition-colors flex justify-center items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" /></svg>
                                     WA
                                 </a>
                             )}
                             {inv.instagram && (
-                                <button onClick={() => copyIgMessage(inv)} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-3 py-2 rounded text-white flex-1 text-center">
+                                <button onClick={() => copyIgMessage(inv)} className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 hover:from-purple-100 hover:to-pink-100 px-4 py-3 rounded-lg text-purple-700 flex-1 text-center transition-colors flex justify-center items-center gap-1.5">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                                     IG
                                 </button>
                             )}
-                            <button onClick={() => handleDelete(inv.id, inv.full_name)} className="bg-red-900/80 hover:bg-red-800 px-3 py-2 rounded text-red-100 flex-1 text-center">
-                                Delete
+                            <button onClick={() => handleDelete(inv.id, inv.full_name)} className="bg-red-50 border border-red-100 hover:bg-red-100 px-4 py-3 rounded-lg text-red-600 flex-none text-center transition-colors">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </div>
                     </div>
                 ))}
                 {filteredInvitees.length === 0 && (
-                    <div className="text-center text-gray-500 py-8">No invitees found.</div>
+                    <div className="text-center text-gray-500 text-lg py-12 bg-white rounded-2xl border border-gray-100 shadow-sm">Tidak ada data undangan.</div>
                 )}
             </div>
 
-            <div className="hidden sm:block overflow-x-auto">
+            <div className="hidden sm:block overflow-x-auto bg-white shadow-sm border border-gray-100 rounded-2xl">
                 {/* Desktop Table */}
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="border-b border-gray-800 text-sm text-gray-400 uppercase tracking-wider">
-                            <th className="py-4 font-semibold">Name</th>
-                            <th className="py-4 font-semibold">Phone / IG</th>
-                            <th className="py-4 font-semibold">Status</th>
-                            <th className="py-4 font-semibold text-right">Actions</th>
+                        <tr className="border-b border-gray-100 bg-gray-50/50 text-sm text-gray-500 uppercase tracking-widest">
+                            <th className="py-5 px-6 font-bold">Name</th>
+                            <th className="py-5 px-6 font-bold">Contact</th>
+                            <th className="py-5 px-6 font-bold">Status</th>
+                            <th className="py-5 px-6 font-bold text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-800">
+                    <tbody className="divide-y divide-gray-100">
                         {filteredInvitees.map(inv => (
-                            <tr key={inv.id} className="hover:bg-zinc-900/50 transition-colors">
-                                <td className="py-4">
-                                    <div className="text-white font-medium">{inv.full_name}</div>
-                                    <div className="text-xs text-gray-500">Pax: {inv.max_pax}</div>
+                            <tr key={inv.id} className="hover:bg-gray-50/50 transition-colors">
+                                <td className="py-5 px-6">
+                                    <div className="text-gray-900 font-bold text-lg">{inv.full_name}</div>
+                                    <div className="text-sm text-gray-400 mt-1 uppercase tracking-wider font-semibold">Pax: {inv.max_pax}</div>
                                 </td>
-                                <td className="py-4 flex flex-col gap-1">
-                                    {inv.phone && <span className="text-sm text-gray-300">📞 {inv.phone}</span>}
-                                    {inv.instagram && <span className="text-sm text-gray-300">📸 {inv.instagram}</span>}
-                                    {!inv.phone && !inv.instagram && <span className="text-xs text-gray-600">-</span>}
+                                <td className="py-5 px-6 flex flex-col gap-2 justify-center h-full">
+                                    {inv.phone && <span className="text-base text-gray-600 flex items-center gap-2"><svg className="w-4 h-4 text-[#25D366]" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" /></svg> {inv.phone}</span>}
+                                    {inv.instagram && <span className="text-base text-gray-600 flex items-center gap-2"><svg className="w-4 h-4 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> {inv.instagram}</span>}
+                                    {!inv.phone && !inv.instagram && <span className="text-sm text-gray-400">-</span>}
                                 </td>
-                                <td className="py-4">
+                                <td className="py-5 px-6">
                                     <button
                                         onClick={() => handleToggleSent(inv.id, inv.is_sent)}
-                                        className={`px-3 py-1 rounded-full text-xs font-semibold ${inv.is_sent ? 'bg-green-900/50 text-green-400' : 'bg-yellow-900/50 text-yellow-400'
+                                        className={`px-5 py-2 rounded-full text-xs uppercase tracking-wider font-bold border transition-colors ${inv.is_sent ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100'
                                             }`}
                                     >
-                                        {inv.is_sent ? 'Sent' : 'Not Sent'}
+                                        {inv.is_sent ? 'Terkirim' : 'Belum'}
                                     </button>
                                 </td>
-                                <td className="py-4">
-                                    <div className="flex gap-2 justify-end">
-                                        <button onClick={() => handleOpenModal(inv)} className="bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-white text-xs">
+                                <td className="py-4 px-6">
+                                    <div className="flex gap-2 justify-end text-[11px] font-bold tracking-wider uppercase">
+                                        <button onClick={() => handleOpenModal(inv)} className="bg-gray-50 border border-gray-200 hover:bg-gray-100 px-3 py-2 rounded text-gray-600 transition-colors">
                                             Edit
                                         </button>
                                         {inv.phone && (
-                                            <a href={getWaLink(inv)} target="_blank" rel="noreferrer" className="bg-green-700 hover:bg-green-600 px-3 py-1.5 rounded text-white text-xs text-center">
+                                            <a href={getWaLink(inv)} target="_blank" rel="noreferrer" className="bg-[#25D366]/10 border border-[#25D366]/30 hover:bg-[#25D366]/20 px-3 py-2 rounded text-[#25D366] transition-colors flex items-center gap-1">
                                                 WA
                                             </a>
                                         )}
                                         {inv.instagram && (
-                                            <button onClick={() => copyIgMessage(inv)} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-3 py-1.5 rounded text-white text-xs">
+                                            <button onClick={() => copyIgMessage(inv)} className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 hover:from-purple-100 hover:to-pink-100 px-3 py-2 rounded text-purple-700 transition-colors flex items-center gap-1">
                                                 IG
                                             </button>
                                         )}
-                                        <button onClick={() => handleDelete(inv.id, inv.full_name)} className="bg-red-900/80 hover:bg-red-800 px-3 py-1.5 rounded text-red-100 text-xs text-center">
+                                        <button onClick={() => handleDelete(inv.id, inv.full_name)} className="bg-red-50 border border-red-100 hover:bg-red-100 px-3 py-2 rounded text-red-600 transition-colors">
                                             Delete
                                         </button>
                                     </div>
@@ -296,7 +303,7 @@ Wassalamu'alaikum Warahmatullahi Wabarakatuh.`
                         ))}
                         {filteredInvitees.length === 0 && (
                             <tr>
-                                <td colSpan={4} className="text-center text-gray-500 py-8">No invitees found.</td>
+                                <td colSpan={4} className="text-center text-gray-500 py-12">Tidak ada data undangan.</td>
                             </tr>
                         )}
                     </tbody>
@@ -305,39 +312,40 @@ Wassalamu'alaikum Warahmatullahi Wabarakatuh.`
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-                    <div className="bg-zinc-950 border border-gray-800 p-6 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-white">{editingInvitee ? 'Edit Invitee' : 'Add Invitee'}</h2>
-                            <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white text-xl">&times;</button>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
+                    <div className="bg-white border border-gray-100 p-6 sm:p-8 rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl relative">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-[rgba(212,175,55,0.05)] rounded-bl-full pointer-events-none"></div>
+                        <div className="flex justify-between items-center mb-6 relative">
+                            <h2 className="text-xl font-bold font-display tracking-wider text-[var(--accent-gold)] uppercase">{editingInvitee ? 'Edit Invitee' : 'Add Invitee'}</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center transition-colors">&times;</button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-5 relative">
                             <div>
-                                <label className="block text-sm mb-1 text-gray-400">Full Name *</label>
-                                <input required defaultValue={editingInvitee?.full_name || ''} name="full_name" className="w-full bg-zinc-900 border border-gray-800 rounded px-3 py-2 text-white focus:border-gray-500 outline-none" />
+                                <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5 font-bold">Nama Lengkap *</label>
+                                <input required defaultValue={editingInvitee?.full_name || ''} name="full_name" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:outline-none focus:border-[rgba(212,175,55,0.5)] focus:ring-1 focus:ring-[rgba(212,175,55,0.5)] transition-all" />
                             </div>
                             <div>
-                                <label className="block text-sm mb-1 text-gray-400">Display Name {editingInvitee?.display_name ? '' : '(Optional)'}</label>
-                                <input defaultValue={editingInvitee?.display_name || ''} name="display_name" className="w-full bg-zinc-900 border border-gray-800 rounded px-3 py-2 text-white focus:border-gray-500 outline-none" />
-                                <p className="text-xs text-gray-600 mt-1">Shorter name used in the invitation greeting</p>
+                                <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5 font-bold">Nama Panggilan {editingInvitee?.display_name ? '' : '(Opsional)'}</label>
+                                <input defaultValue={editingInvitee?.display_name || ''} name="display_name" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:outline-none focus:border-[rgba(212,175,55,0.5)] focus:ring-1 focus:ring-[rgba(212,175,55,0.5)] transition-all" />
+                                <p className="text-xs text-gray-400 mt-2">Akan digunakan pada sapaan awal undangan.</p>
                             </div>
                             <div>
-                                <label className="block text-sm mb-1 text-gray-400">Phone (WhatsApp)</label>
-                                <input defaultValue={editingInvitee?.phone || ''} name="phone" placeholder="e.g. 08123456789" className="w-full bg-zinc-900 border border-gray-800 rounded px-3 py-2 text-white focus:border-gray-500 outline-none" />
+                                <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5 font-bold">Nomor WA / HP</label>
+                                <input defaultValue={editingInvitee?.phone || ''} name="phone" placeholder="Cth: 08123456789" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:outline-none focus:border-[rgba(212,175,55,0.5)] focus:ring-1 focus:ring-[rgba(212,175,55,0.5)] transition-all" />
                             </div>
                             <div>
-                                <label className="block text-sm mb-1 text-gray-400">Instagram Handle</label>
-                                <input defaultValue={editingInvitee?.instagram || ''} name="instagram" placeholder="e.g. @username" className="w-full bg-zinc-900 border border-gray-800 rounded px-3 py-2 text-white focus:border-gray-500 outline-none" />
+                                <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5 font-bold">Username Instagram</label>
+                                <input defaultValue={editingInvitee?.instagram || ''} name="instagram" placeholder="Cth: @username" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:outline-none focus:border-[rgba(212,175,55,0.5)] focus:ring-1 focus:ring-[rgba(212,175,55,0.5)] transition-all" />
                             </div>
                             <div>
-                                <label className="block text-sm mb-1 text-gray-400">Max Pax *</label>
-                                <input required type="number" min="1" defaultValue={editingInvitee?.max_pax || 2} name="max_pax" className="w-full bg-zinc-900 border border-gray-800 rounded px-3 py-2 text-white focus:border-gray-500 outline-none" />
+                                <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5 font-bold">Maksimal Pax *</label>
+                                <input required type="number" min="1" defaultValue={editingInvitee?.max_pax || 2} name="max_pax" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:outline-none focus:border-[rgba(212,175,55,0.5)] focus:ring-1 focus:ring-[rgba(212,175,55,0.5)] transition-all" />
                             </div>
 
-                            <div className="pt-4 flex justify-end gap-3">
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
-                                <button type="submit" className="bg-white text-black px-4 py-2 rounded font-medium hover:bg-gray-200">Save</button>
+                            <div className="pt-6 flex justify-end gap-3">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-3 text-sm tracking-wider font-bold text-gray-500 hover:text-gray-800 uppercase transition-colors">Batal</button>
+                                <button type="submit" className="font-display bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.4)] text-[var(--accent-gold-dark)] px-6 py-3 rounded-full text-sm tracking-[0.15em] font-bold uppercase hover:bg-[rgba(212,175,55,0.2)] transition-colors">Simpan</button>
                             </div>
                         </form>
                     </div>

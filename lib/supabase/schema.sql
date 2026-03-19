@@ -7,8 +7,10 @@ create table if not exists public.invitees (
     full_name text not null,
     display_name text,
     phone text,
+    instagram text,
     max_pax integer not null default 2,
     is_active boolean not null default true,
+    is_sent boolean not null default false,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );

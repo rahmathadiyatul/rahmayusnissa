@@ -175,9 +175,9 @@ export default function WeddingClient({
             return;
         }
 
-        const paxValue = Number(rsvpPax);
-        if (!Number.isInteger(paxValue) || paxValue <= 0) {
-            setRsvpStatus("Jumlah tamu harus angka dan minimal 1.");
+        const paxValue = rsvpPax;
+        if (!paxValue) {
+            setRsvpStatus("Jumlah tamu harus dipilih.");
             return;
         }
 
@@ -439,7 +439,9 @@ export default function WeddingClient({
                             <p className="font-script mt-6 text-5xl gold-text">Ica</p>
                             <p className="mt-3 text-[15px] silver-text font-bold tracking-wide">Rahma Yus Nissa, S.Pt</p>
                             <p className="mt-3 text-sm text-[var(--text-muted)] leading-relaxed max-w-[280px]">
-                                Putri ke-4 dari <br />Bapak (alm) H. Yusmin RB <br />& Ibu Betmawati
+                                Putri ke-4 dari <br />Alm. Bapak H. Yusmin Rajo Bangkeh <br />
+                                Serta Bapak Syafril Datuak Tanali <br />
+                                & Ibu Betmawati
                             </p>
                         </article>
                     </div>
@@ -568,13 +570,22 @@ export default function WeddingClient({
                         <label className="block">
                             <span className="mb-2 block text-xs tracking-widest silver-text uppercase">Jumlah Tamu (Pax)</span>
                             <div className="relative">
-                                <input
+                                <select
                                     value={rsvpPax}
                                     onChange={(e) => setRsvpPax(e.target.value)}
-                                    className="w-full rounded-xl border border-[rgba(184,188,198,0.2)] bg-[rgba(10,10,12,0.8)] px-5 py-3.5 text-white outline-none focus:border-[rgba(212,175,55,0.7)] transition-colors focus:bg-[rgba(20,20,24,0.9)]"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                />
+                                    className="w-full appearance-none rounded-xl border border-[rgba(184,188,198,0.2)] bg-[rgba(10,10,12,0.8)] px-5 py-3.5 text-white outline-none focus:border-[rgba(212,175,55,0.7)] transition-colors focus:bg-[rgba(20,20,24,0.9)] cursor-pointer"
+                                >
+                                    <option value="1">1 Orang</option>
+                                    <option value="2">2 Orang</option>
+                                    <option value="3">3 Orang</option>
+                                    <option value="4">4 Orang</option>
+                                    <option value="Lebih dari 4 orang">Lebih dari 4 orang</option>
+                                </select>
+                                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
                             </div>
                         </label>
 

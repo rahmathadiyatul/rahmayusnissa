@@ -92,10 +92,7 @@ export default function DashboardClient({ initialInvitees }: { initialInvitees: 
         const phone = invitee.phone.startsWith('0') ? '62' + invitee.phone.slice(1) : invitee.phone
         const isSent = invitee.is_sent
         let icon = "wa"
-        const text = encodeURIComponent(`Assalamu'alaikum Warahmatullahi Wabarakatuh / Salam Sejahtera,
-
-Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i ${invitee.display_name || invitee.full_name} untuk menghadiri acara pernikahan kami:
-
+        const text = encodeURIComponent(`
 Assalamu'alaikum Warahmatullahi Wabarakatuh,
 
 Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i [Nama Invitee] untuk menghadiri acara pernikahan kami:
@@ -117,8 +114,6 @@ Berikut tautan undangan digital kami untuk informasi lebih lengkap:
 https://ica-afdal.com/wedding?invitee=${invitee.id}
 
 Merupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu.
-
-Mohon maaf karena keterbatasan, undangan ini hanya dibagikan melalui pesan digital.
 
 Terima kasih banyak atas perhatian dan doa restunya.
 

@@ -27,13 +27,13 @@ The fields are: id, full_name, display_name, phone, instagram, max_pax (default 
 
 CRITICAL RULES:
 1. BEFORE editing or deleting a user, if you only have a name (and no exact ID), ALWAYS use "search_invitee" first.
-2. If "search_invitee" returns multiple people with the same name, STOP. Show the user the options along with their display_name, phone or instagram, and ask: "Which one do you mean?". Do not guess or pick the first one blindly.
-3. If "search_invitee" returns NO matches, tell the user the person could not be found.
-4. If the user asks you to add multiple people, use "add_multiple_invitees".
-5. For updates and deletes, after you successfully run the tool, tell the user what was specifically accomplished.
-6. When adding users, you can infer display_name from full_name if not provided (e.g. Full: Budi Setiawan -> Display: Budi). Phone numbers should contain only digits where possible.
-7. NEVER apologize excessively. Be snappy and concise.
-8. NEVER call search_invitee and edit_invitee/delete_invitee in the same step. You MUST wait for the search results to come back with the exact UUID before proceeding.
+2. If "search_invitee" returns NO matches, DO NOT guess or hallucinate an ID. STOP and tell the user you could not find the person.
+3. If "search_invitee" returns multiple people with the same name, STOP. Show the user the options along with their display_name, phone or instagram, and ask: "Which one do you mean?". Do not guess or pick the first one blindly.
+4. When you add a new invitee using "add_invitee", the tool will return an "insertedId". You MUST reveal this ID to the user in your message (e.g., "Added Budi. Their ID is <id>.") so that it is established in the conversation history. This allows the user to immediately say "edit them" and you will already have the ID.
+5. If the user asks you to add multiple people, use "add_multiple_invitees".
+6. For updates and deletes, after you successfully run the tool, tell the user what was specifically accomplished.
+7. When adding users, you can infer display_name from full_name if not provided. Phone numbers should contain only digits where possible.
+8. NEVER call search_invitee AND edit_invitee/delete_invitee in the very same step. You MUST wait for the exact UUID from the search results before calling an edit/delete tool.
 
 Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
         tools: {
@@ -44,10 +44,23 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
                 }),
                 execute: async ({ name }: { name: string }) => {
                     const supabase = createSupabaseServerClient();
-                    const { data, error } = await supabase
+
+                    // Simple search first
+                    let { data, error } = await supabase
                         .from('invitees')
                         .select('*')
                         .ilike('full_name', `%${name}%`);
+
+                    // If simple search fails but we have a multi-word name, try just the first name
+                    if ((!data || data.length === 0) && name.includes(' ')) {
+                        const firstName = name.split(' ')[0];
+                        const fallback = await supabase
+                            .from('invitees')
+                            .select('*')
+                            .ilike('full_name', `%${firstName}%`);
+                        data = fallback.data;
+                        error = fallback.error;
+                    }
 
                     if (error) throw new Error(error.message);
                     return { results: data, count: data?.length || 0 };
@@ -110,7 +123,7 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
                     const { error } = await supabase.from('invitees').insert(payload);
                     if (error) return { success: false, error: error.message };
                     revalidatePath('/dashboard', 'layout');
-                    return { success: true, count: payload.length, message: `Successfully added ${payload.length} invitees.` };
+                    return { success: true, count: payload.length, message: `Successfully added ${payload.length} invitees. Here are their IDs.`, insertedIds: payload.map((p: any) => ({ name: p.full_name, id: p.id })) };
                 },
             }),
 

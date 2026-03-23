@@ -12,6 +12,7 @@ export type InviteeRow = {
     max_pax: number
     is_active: boolean
     is_sent: boolean
+    created_at: string | null
 }
 
 export async function getInvitees() {

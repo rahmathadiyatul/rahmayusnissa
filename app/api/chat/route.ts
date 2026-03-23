@@ -132,7 +132,7 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
 
                     const { data, error } = await supabase
                         .from('invitees')
-                        .select('id, full_name, display_name, phone, instagram, max_pax, is_active, is_sent')
+                        .select('*')
                         .order('created_at', { ascending: false });
 
                     if (error) {

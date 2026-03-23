@@ -1,13 +1,16 @@
 ---
 title: Dashboard Implementation Plan
 created: 2026-03-20
-updated: 2026-03-20
-version: 1.0.0
+updated: 2026-03-24
+version: 1.1.0
 status: Completed
 changelog:
   - version: 1.0.0
     date: 2026-03-20
     changes: "Initial completion of dashboard for invitee management"
+  - version: 1.1.0
+    date: 2026-03-24
+    changes: "Added detail undangan with graphs, responsive layout via hamburger menu, and route loading states."
 audience: Bride & Groom
 reference: 
   - none
@@ -34,13 +37,15 @@ We will add:
 ## 3. Core Features & UX
 - **Mobile First Focus:** Since the user will primarily use a mobile phone, a traditional wide table won't fit perfectly. The UI will use a "Card List" approach on mobile (showing Name, Status, and Actions) and a "Data Table" on desktop.
 - **Navigation & Layout:**
-  - Responsive 2-column Desktop Sidebar with a mobile Hamburger Menu toggle.
-  - Admin layout routes are wrapped in a `loading.tsx` Suspense boundary for instant navigation feedback.
+  - Responsive layout structured with `DashboardLayoutClient` handling the app shell state.
+  - Mobile features a toggleable Hamburger Menu that controls a slide-out overlay backdrop.
+  - Desktop features a sticky sidebar so navigation remains available even when scrolling through long lists.
+  - Admin layout routes are wrapped in a `loading.tsx` Suspense boundary featuring a custom spinning ring for instant navigation feedback to prevent frozen-UI perceptions.
 - **Top Actions:**
-  - A sticky top bar or fixed header containing the **Search by Name** input, a dropdown **Status Filter (Semua, Terkirim, Belum)**, and an **Add Invitee** button.
+  - A sticky top bar or fixed header containing the **Search by Name** input, a `<select>` dropdown **Status Filter (Semua, Terkirim, Belum)** dynamically reacting alongside text search, and an **Add Invitee** button.
 - **Detail Undangan Page (/dashboard/detail):**
   - Displays aggregated statistical counter cards for: Total Undangan, Terkirim, Pax Terkirim, Total Semua Pax.
-  - Renders a clean echarts side-by-side grouped Bar Chart to visually compare Sent vs Unsent data.
+  - Features an "overview-chart" built via `recharts` presenting a side-by-side grouped Bar Chart to visually map and compare Sent vs Unsent metrics.
 - **Invitee Actions:**
   - **Edit:** Opens a modal to edit details (Phone, IG, Name, etc.).
   - **Send to WA:** Opens `wa.me/<phone>?text=<encoded_template>`.

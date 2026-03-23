@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useTransition } from 'react'
 import {
     InviteeRow,
     toggleInviteeSent,
@@ -14,15 +14,18 @@ export default function DashboardClient({ initialInvitees }: { initialInvitees: 
     const [invitees, setInvitees] = useState(initialInvitees)
     const [search, setSearch] = useState('')
     const [statusFilter, setStatusFilter] = useState<'all' | 'sent' | 'unsent'>('all')
+    const [sortBy, setSortBy] = useState<'created' | 'name' | 'status'>('created')
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingInvitee, setEditingInvitee] = useState<InviteeRow | null>(null)
+    const [isPending, startTransition] = useTransition()
 
     useEffect(() => {
         setInvitees(initialInvitees)
     }, [initialInvitees])
 
     const filteredInvitees = useMemo(() => {
-        return invitees.filter(inv => {
+        const filtered = invitees.filter(inv => {
             const matchesSearch = inv.full_name.toLowerCase().includes(search.toLowerCase()) ||
                 (inv.display_name && inv.display_name.toLowerCase().includes(search.toLowerCase()))
 
@@ -30,7 +33,29 @@ export default function DashboardClient({ initialInvitees }: { initialInvitees: 
 
             return matchesSearch && matchesStatus
         })
-    }, [invitees, search, statusFilter])
+
+        return filtered.sort((a, b) => {
+            const modifier = sortOrder === 'asc' ? 1 : -1
+
+            if (sortBy === 'name') {
+                return a.full_name.localeCompare(b.full_name) * modifier
+            }
+
+            if (sortBy === 'status') {
+                if (a.is_sent === b.is_sent) {
+                    return a.full_name.localeCompare(b.full_name)
+                }
+
+                // Show unsent invitees first to prioritize pending sends if desc, opposite if asc.
+                return (Number(a.is_sent) - Number(b.is_sent)) * modifier
+            }
+
+            const aDate = a.created_at ? new Date(a.created_at).getTime() : 0
+            const bDate = b.created_at ? new Date(b.created_at).getTime() : 0
+            // Default created is newest first (desc). modifier=1 (asc) flips it to oldest first.
+            return (bDate - aDate) * modifier
+        })
+    }, [invitees, search, statusFilter, sortBy, sortOrder])
 
     const handleToggleSent = async (id: string, currentStatus: boolean) => {
         // Optimistic update
@@ -193,33 +218,78 @@ Wassalamu'alaikum Warahmatullahi Wabarakatuh.`
                         className="flex-1 bg-white border border-gray-200 shadow-sm rounded-full pl-11 pr-4 py-3 text-base text-gray-800 focus:outline-none focus:border-[rgba(212,175,55,0.5)] focus:ring-1 focus:ring-[rgba(212,175,55,0.5)] transition-all"
                     />
                     <svg className="w-5 h-5 text-gray-400 absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-
-                    <select
-                        value={statusFilter}
-                        onChange={e => setStatusFilter(e.target.value as 'all' | 'sent' | 'unsent')}
-                        className="bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 focus:outline-none">
-                        <option value="all">Semua</option>
-                        <option value="sent">Terkirim</option>
-                        <option value="unsent">Belum</option>
-                    </select>
                 </div>
-                <div className="flex gap-3 w-full sm:w-auto">
-                    <button
-                        onClick={() => handleOpenModal()}
-                        className="flex-1 sm:flex-none font-display text-xs tracking-[0.2em] font-bold bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.4)] text-[var(--accent-gold-dark)] px-6 py-3 rounded-full hover:bg-[rgba(212,175,55,0.2)] transition-colors shadow-sm uppercase flex items-center justify-center gap-1.5"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
-                        TAMBAH
-                    </button>
-                    {('contacts' in navigator && 'ContactsManager' in window) && (
-                        <button
-                            onClick={handleImportContacts}
-                            className="flex-1 sm:flex-none font-display text-xs tracking-[0.2em] font-bold bg-white border border-gray-300 text-gray-600 px-5 py-3 rounded-full hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm uppercase flex items-center justify-center gap-1.5"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            IMPORT KONTAK
-                        </button>
+                <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                    {isPending && (
+                        <div className="flex items-center justify-center px-2 mt-auto h-[38px]">
+                            <svg className="animate-spin w-5 h-5 text-[var(--accent-gold-dark)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
                     )}
+                    <div className="flex-1 sm:flex-none flex flex-col gap-1">
+                        <label className="text-[10px] font-bold tracking-wider text-gray-400 uppercase ml-3">Filter</label>
+                        <select
+                            value={statusFilter}
+                            onChange={e => startTransition(() => setStatusFilter(e.target.value as 'all' | 'sent' | 'unsent'))}
+                            className="w-full bg-white border border-gray-200 rounded-full px-3 py-2 text-sm text-gray-700 focus:outline-none">
+                            <option value="all">Semua</option>
+                            <option value="sent">Terkirim</option>
+                            <option value="unsent">Belum</option>
+                        </select>
+                    </div>
+                    <div className="flex-1 sm:flex-none flex flex-col gap-1">
+                        <label className="text-[10px] font-bold tracking-wider text-gray-400 uppercase ml-3">
+                            Urutkan
+                        </label>
+                        <div className="flex items-center gap-1.5">
+                            <select
+                                value={sortBy}
+                                onChange={e => {
+                                    const newSortBy = e.target.value as 'created' | 'name' | 'status'
+                                    startTransition(() => {
+                                        setSortBy(newSortBy)
+                                        setSortOrder(newSortBy === 'name' ? 'asc' : 'desc') // default name to A-Z, others to desc
+                                    })
+                                }}
+                                className="flex-1 w-full bg-white border border-gray-200 rounded-full px-3 py-2 text-sm text-gray-700 focus:outline-none"
+                            >
+                                <option value="created">Tanggal Dibuat</option>
+                                <option value="name">Nama</option>
+                                <option value="status">Status</option>
+                            </select>
+                            <button
+                                onClick={() => startTransition(() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc'))}
+                                className="bg-white border border-gray-200 rounded-full w-[38px] h-[38px] flex items-center justify-center text-gray-600 hover:bg-gray-50 flex-none transition-colors"
+                                title={sortOrder === 'asc' ? 'Urutkan Menurun' : 'Urutkan Menaik'}
+                            >
+                                {sortOrder === 'asc' ? (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
+                                ) : (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" /></svg>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                    <div className="flex-1 sm:flex-none flex items-end gap-3">
+                        <button
+                            onClick={() => handleOpenModal()}
+                            className="flex-1 sm:flex-none font-display text-xs tracking-[0.2em] font-bold bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.4)] text-[var(--accent-gold-dark)] px-4 py-2 mt-auto h-[38px] rounded-full hover:bg-[rgba(212,175,55,0.2)] transition-colors shadow-sm uppercase flex items-center justify-center gap-1.5"
+                        >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                            TAMBAH
+                        </button>
+                        {('contacts' in navigator && 'ContactsManager' in window) && (
+                            <button
+                                onClick={handleImportContacts}
+                                className="flex-1 sm:flex-none font-display text-xs tracking-[0.2em] font-bold bg-white border border-gray-300 text-gray-600 px-4 py-2 mt-auto h-[38px] rounded-full hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm uppercase flex items-center justify-center gap-1.5"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                IMPORT KONTAK
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 

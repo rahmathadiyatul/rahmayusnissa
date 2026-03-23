@@ -1,29 +1,59 @@
 import { createGroq } from '@ai-sdk/groq';
+import { createOpenAI } from '@ai-sdk/openai';
 import { streamText, tool } from 'ai';
 import { z } from 'zod';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { buildDashboardDetailContext } from '@/lib/dashboard/detail-context';
 
 // Allow responses up to 5 minutes
 export const maxDuration = 300;
 
+function getLiteLLMBaseURL() {
+    const raw = process.env.LITELLM_API;
+    if (!raw) {
+        throw new Error('Missing LITELLM_API environment variable.');
+    }
+
+    return `${raw.replace(/\/$/, '')}/v1`;
+}
+
+function getTavilyApiKey() {
+    const raw = process.env.TAVILY_API_KEY;
+    if (!raw) {
+        throw new Error('Missing TAVILY_API_KEY environment variable.');
+    }
+
+    return raw;
+}
+
 export async function POST(req: Request) {
     const { messages } = await req.json();
+    const aiProvider = (process.env.AI_PROVIDER || 'groq').toLowerCase();
 
     const groq = createGroq({
         apiKey: process.env.GROQ_API_KEY,
     });
 
-    const result = await streamText({
-        model: groq('llama-3.1-8b-instant', {
+    const litellm = createOpenAI({
+        baseURL: getLiteLLMBaseURL(),
+        apiKey: process.env.LITELLM_VIRTUAL_KEY,
+    });
+
+    const model = aiProvider === 'litellm'
+        ? litellm(process.env.LITELLM_MODEL || 'qwen/qwen3.5-397b-a17b')
+        : groq('llama-3.1-8b-instant', {
             parallelToolCalls: false,
-        }) as any,
+        });
+
+    const result = await streamText({
+        model: model as any,
         messages,
         maxSteps: 5,
         system: `You are an intelligent, polite, and heavily capable Wedding Assistant. 
 You are integrated into a wedding invitation dashboard.
 You can perform actions on the "invitees" database.
-The fields are: id, full_name, display_name, phone, instagram, max_pax (default 2).
+The fields are: id, full_name, display_name, phone, instagram, max_pax (default 2), is_active, is_sent.
 
 CRITICAL RULES:
 1. BEFORE editing or deleting a user, if you only have a name (and no exact ID), ALWAYS use "search_invitee" first.
@@ -35,9 +65,95 @@ CRITICAL RULES:
 7. When adding users, you can infer display_name from full_name if not provided. Phone numbers should contain only digits where possible.
 8. NEVER call search_invitee AND edit_invitee/delete_invitee in the very same step. You MUST wait for the exact UUID from the search results before calling an edit/delete tool.
 9. If the user asks to edit by name (without ID), prefer using "edit_invitee_by_name" so the server handles search + disambiguation deterministically.
+10. If the user asks to delete by name (without ID), prefer using "delete_invitee_by_name" so the server handles search + disambiguation deterministically.
+11. NEVER edit or delete invitees where is_sent=true. If requested, explain that sent invitees are locked for data integrity.
+12. If the user asks for an overall dashboard/detail status summary, use "get_dashboard_detail_context" first before answering.
+13. If the user asks for web/latest/external information, use "web_search" and cite the returned sources in your answer.
 
 Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
         tools: {
+            web_search: tool({
+                description: 'Search the web for recent or external information using Tavily. Returns concise results with URLs.',
+                parameters: z.object({
+                    query: z.string().min(2).describe('What to search on the web.'),
+                    maxResults: z.number().int().min(1).max(10).optional().describe('How many results to return (1-10). Defaults to 5.'),
+                    searchDepth: z.enum(['basic', 'advanced']).optional().describe('Search depth for Tavily. Defaults to basic.'),
+                }),
+                execute: async ({ query, maxResults, searchDepth }: { query: string; maxResults?: number; searchDepth?: 'basic' | 'advanced' }) => {
+                    const apiKey = getTavilyApiKey();
+
+                    const response = await fetch('https://api.tavily.com/search', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            api_key: apiKey,
+                            query,
+                            max_results: maxResults ?? 5,
+                            search_depth: searchDepth ?? 'basic',
+                            include_answer: true,
+                            include_raw_content: false,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        return {
+                            success: false,
+                            error: `Tavily request failed (${response.status}): ${errorText || 'Unknown error'}`,
+                        };
+                    }
+
+                    const data = await response.json();
+                    const results = Array.isArray(data?.results)
+                        ? data.results.map((item: any) => ({
+                            title: item?.title ?? '',
+                            url: item?.url ?? '',
+                            content: item?.content ?? '',
+                            score: item?.score ?? null,
+                        }))
+                        : [];
+
+                    return {
+                        success: true,
+                        query,
+                        answer: data?.answer ?? null,
+                        results,
+                    };
+                },
+            }),
+
+            get_dashboard_detail_context: tool({
+                description: 'Retrieve the same aggregated context shown in /dashboard/detail for invitee delivery and pax status.',
+                parameters: z.object({}),
+                execute: async () => {
+                    const supabase = createSupabaseServerClient();
+
+                    const { data, error } = await supabase
+                        .from('invitees')
+                        .select('id, full_name, display_name, phone, instagram, max_pax, is_active, is_sent')
+                        .order('created_at', { ascending: false });
+
+                    if (error) {
+                        return { success: false, error: error.message };
+                    }
+
+                    const invitees = (data || []).map((invitee) => ({
+                        ...invitee,
+                        max_pax: invitee.max_pax ?? 0,
+                    }));
+
+                    const detailContext = buildDashboardDetailContext(invitees);
+
+                    return {
+                        success: true,
+                        generatedAt: new Date().toISOString(),
+                        detailContext,
+                    };
+                },
+            }),
+
             search_invitee: tool({
                 description: 'Search for an invitee by name to get their exact ID and details before editing or deleting.',
                 parameters: z.object({
@@ -50,7 +166,7 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
                     let { data, error } = await supabase
                         .from('invitees')
                         .select('*')
-                        .ilike('full_name', `%${name}%`);
+                        .or(`full_name.ilike.%${name}%,display_name.ilike.%${name}%`);
 
                     // If simple search fails but we have a multi-word name, try just the first name
                     if ((!data || data.length === 0) && name.includes(' ')) {
@@ -58,7 +174,7 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
                         const fallback = await supabase
                             .from('invitees')
                             .select('*')
-                            .ilike('full_name', `%${firstName}%`);
+                            .or(`full_name.ilike.%${firstName}%,display_name.ilike.%${firstName}%`);
                         data = fallback.data;
                         error = fallback.error;
                     }
@@ -146,6 +262,22 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
                         Object.entries(updates).filter(([_, v]) => v !== undefined)
                     );
 
+                    const { data: existing, error: existingError } = await supabase
+                        .from('invitees')
+                        .select('id, is_sent')
+                        .eq('id', id)
+                        .limit(1);
+
+                    if (existingError) return { success: false, error: existingError.message };
+                    if (!existing || existing.length === 0) return { success: false, error: "No invitee found with this ID. Make sure you used the exact UUID from search_invitee." };
+                    if (existing[0].is_sent) {
+                        return {
+                            success: false,
+                            reason: 'sent_locked',
+                            message: `Cannot edit invitee ${id} because invitation is already sent.`,
+                        };
+                    }
+
                     const { data, error } = await supabase
                         .from('invitees')
                         .update({ ...cleanUpdates, updated_at: new Date().toISOString() })
@@ -181,15 +313,15 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
 
                     let { data: matches, error: searchError } = await supabase
                         .from('invitees')
-                        .select('id, full_name, display_name, phone, instagram')
-                        .ilike('full_name', `%${name}%`);
+                        .select('id, full_name, display_name, phone, instagram, is_sent')
+                        .or(`full_name.ilike.%${name}%,display_name.ilike.%${name}%`);
 
                     if ((!matches || matches.length === 0) && name.includes(' ')) {
                         const firstName = name.split(' ')[0];
                         const fallback = await supabase
                             .from('invitees')
-                            .select('id, full_name, display_name, phone, instagram')
-                            .ilike('full_name', `%${firstName}%`);
+                            .select('id, full_name, display_name, phone, instagram, is_sent')
+                            .or(`full_name.ilike.%${firstName}%,display_name.ilike.%${firstName}%`);
                         matches = fallback.data;
                         searchError = fallback.error;
                     }
@@ -217,6 +349,14 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
                     }
 
                     const target = matches![0];
+                    if (target.is_sent) {
+                        return {
+                            success: false,
+                            reason: 'sent_locked',
+                            message: `Cannot edit invitee "${target.full_name}" because invitation is already sent.`,
+                        };
+                    }
+
                     const cleanUpdates = Object.fromEntries(
                         Object.entries(updates).filter(([_, v]) => v !== undefined)
                     );
@@ -246,6 +386,23 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
                 }),
                 execute: async ({ id }: { id: string }) => {
                     const supabase = createSupabaseServerClient();
+
+                    const { data: existing, error: existingError } = await supabase
+                        .from('invitees')
+                        .select('id, is_sent')
+                        .eq('id', id)
+                        .limit(1);
+
+                    if (existingError) return { success: false, error: existingError.message };
+                    if (!existing || existing.length === 0) return { success: false, error: "No invitee found with this ID. Make sure you used the exact UUID from search_invitee." };
+                    if (existing[0].is_sent) {
+                        return {
+                            success: false,
+                            reason: 'sent_locked',
+                            message: `Cannot delete invitee ${id} because invitation is already sent.`,
+                        };
+                    }
+
                     const { data, error } = await supabase.from('invitees').delete().eq('id', id).select();
 
                     if (error) return { success: false, error: error.message };
@@ -253,6 +410,78 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
 
                     revalidatePath('/dashboard', 'layout');
                     return { success: true, message: `Deleted invitee ${id}.` };
+                }
+            }),
+
+            delete_invitee_by_name: tool({
+                description: 'Delete an invitee by name. Use this when user does not provide ID. The server will search and safely handle not-found/multiple matches.',
+                parameters: z.object({
+                    name: z.string().describe('The full or partial name to search for.'),
+                }),
+                execute: async ({ name }: { name: string }) => {
+                    const supabase = createSupabaseServerClient();
+
+                    let { data: matches, error: searchError } = await supabase
+                        .from('invitees')
+                        .select('id, full_name, display_name, phone, instagram, is_sent')
+                        .or(`full_name.ilike.%${name}%,display_name.ilike.%${name}%`);
+
+                    if ((!matches || matches.length === 0) && name.includes(' ')) {
+                        const firstName = name.split(' ')[0];
+                        const fallback = await supabase
+                            .from('invitees')
+                            .select('id, full_name, display_name, phone, instagram, is_sent')
+                            .or(`full_name.ilike.%${firstName}%,display_name.ilike.%${firstName}%`);
+                        matches = fallback.data;
+                        searchError = fallback.error;
+                    }
+
+                    if (searchError) {
+                        return { success: false, error: searchError.message };
+                    }
+
+                    const count = matches?.length || 0;
+                    if (count === 0) {
+                        return {
+                            success: false,
+                            reason: 'not_found',
+                            message: `No invitee found for name "${name}".`,
+                        };
+                    }
+
+                    if (count > 1) {
+                        return {
+                            success: false,
+                            reason: 'ambiguous',
+                            message: `Found ${count} invitees for "${name}". Please choose the exact person first.`,
+                            matches,
+                        };
+                    }
+
+                    const target = matches![0];
+                    if (target.is_sent) {
+                        return {
+                            success: false,
+                            reason: 'sent_locked',
+                            message: `Cannot delete invitee "${target.full_name}" because invitation is already sent.`,
+                        };
+                    }
+
+                    const { data: deleted, error: deleteError } = await supabase
+                        .from('invitees')
+                        .delete()
+                        .eq('id', target.id)
+                        .select('id, full_name, display_name, phone, instagram');
+
+                    if (deleteError) return { success: false, error: deleteError.message };
+                    if (!deleted || deleted.length === 0) return { success: false, error: 'Delete failed: invitee not found during delete step.' };
+
+                    revalidatePath('/dashboard', 'layout');
+                    return {
+                        success: true,
+                        message: `Deleted invitee by name "${name}" successfully.`,
+                        deletedInvitee: deleted[0],
+                    };
                 }
             })
         },

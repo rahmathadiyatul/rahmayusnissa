@@ -3,6 +3,8 @@
 import { useChat } from 'ai/react';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function ChatAssistant() {
     const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +81,27 @@ export default function ChatAssistant() {
                                 ? 'bg-gray-900 text-white rounded-br-none'
                                 : 'bg-white border border-gray-100 shadow-sm text-gray-800 rounded-bl-none'
                                 }`}>
-                                {m.content}
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm]}
+                                    components={{
+                                        strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
+                                        p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                                        ul: ({ node, ...props }) => <ul className="list-disc ml-4 mb-2 empty:hidden" {...props} />,
+                                        ol: ({ node, ...props }) => <ol className="list-decimal ml-4 mb-2 empty:hidden" {...props} />,
+                                        li: ({ node, ...props }) => <li className="mb-0.5" {...props} />,
+                                        a: ({ node, ...props }) => <a className="text-blue-500 hover:underline" {...props} />,
+                                        h1: ({ node, ...props }) => <h1 className="font-bold text-lg mb-2" {...props} />,
+                                        h2: ({ node, ...props }) => <h2 className="font-bold text-base mb-2" {...props} />,
+                                        h3: ({ node, ...props }) => <h3 className="font-semibold text-base mb-1" {...props} />,
+                                        table: ({ node, ...props }) => <div className="w-full overflow-x-auto mb-2 rounded border border-gray-200"><table className="w-full text-left text-xs border-collapse" {...props} /></div>,
+                                        thead: ({ node, ...props }) => <thead className="bg-gray-100/80 text-gray-700" {...props} />,
+                                        th: ({ node, ...props }) => <th className="border-b border-gray-200 px-3 py-2 font-semibold" {...props} />,
+                                        td: ({ node, ...props }) => <td className="border-b border-gray-200 px-3 py-2 last:border-b-0" {...props} />,
+                                        tr: ({ node, ...props }) => <tr className="last:border-b-0" {...props} />,
+                                    }}
+                                >
+                                    {m.content}
+                                </ReactMarkdown>
                             </div>
                         )}
 

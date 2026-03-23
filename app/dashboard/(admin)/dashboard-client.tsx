@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
     InviteeRow,
     toggleInviteeSent,
@@ -16,6 +16,10 @@ export default function DashboardClient({ initialInvitees }: { initialInvitees: 
     const [statusFilter, setStatusFilter] = useState<'all' | 'sent' | 'unsent'>('all')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingInvitee, setEditingInvitee] = useState<InviteeRow | null>(null)
+
+    useEffect(() => {
+        setInvitees(initialInvitees)
+    }, [initialInvitees])
 
     const filteredInvitees = useMemo(() => {
         return invitees.filter(inv => {

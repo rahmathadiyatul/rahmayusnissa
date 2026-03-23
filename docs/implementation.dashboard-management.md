@@ -33,8 +33,14 @@ We will add:
 
 ## 3. Core Features & UX
 - **Mobile First Focus:** Since the user will primarily use a mobile phone, a traditional wide table won't fit perfectly. The UI will use a "Card List" approach on mobile (showing Name, Status, and Actions) and a "Data Table" on desktop.
+- **Navigation & Layout:**
+  - Responsive 2-column Desktop Sidebar with a mobile Hamburger Menu toggle.
+  - Admin layout routes are wrapped in a `loading.tsx` Suspense boundary for instant navigation feedback.
 - **Top Actions:**
-  - A sticky top bar or fixed header containing the **Search by Name** input and an **Add Invitee** button.
+  - A sticky top bar or fixed header containing the **Search by Name** input, a dropdown **Status Filter (Semua, Terkirim, Belum)**, and an **Add Invitee** button.
+- **Detail Undangan Page (/dashboard/detail):**
+  - Displays aggregated statistical counter cards for: Total Undangan, Terkirim, Pax Terkirim, Total Semua Pax.
+  - Renders a clean echarts side-by-side grouped Bar Chart to visually compare Sent vs Unsent data.
 - **Invitee Actions:**
   - **Edit:** Opens a modal to edit details (Phone, IG, Name, etc.).
   - **Send to WA:** Opens `wa.me/<phone>?text=<encoded_template>`.

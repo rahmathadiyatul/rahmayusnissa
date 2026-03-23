@@ -37,7 +37,8 @@ The AI will be equipped with the following tools:
 - A floating chat bubble placed on the bottom right `layout.tsx` of the admin dashboard.
 - Utilizes `useChat` hook for streaming realtime text.
 - Visually shows when a tool is running (e.g., a small loading spinner: "Searching for Rahmat...").
-- Safely refreshes the dashboard data (`router.refresh()`) when a mutation tool finishes.
+- Safely refreshes the dashboard data (`router.refresh()`) when a mutation tool finishes. Dashboard client lists automatically trigger a re-render pipeline via `useEffect` prop syncing.
+- AI text formatting utilizes `react-markdown` and `remark-gfm` to cleanly parse complex responsesincluding tablesinto styled Tailwind elements.
 
 ## 4. Implementation Steps
 1. Document the plan. *(You are here)*

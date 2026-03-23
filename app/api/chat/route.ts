@@ -34,6 +34,7 @@ CRITICAL RULES:
 6. For updates and deletes, after you successfully run the tool, tell the user what was specifically accomplished.
 7. When adding users, you can infer display_name from full_name if not provided. Phone numbers should contain only digits where possible.
 8. NEVER call search_invitee AND edit_invitee/delete_invitee in the very same step. You MUST wait for the exact UUID from the search results before calling an edit/delete tool.
+9. If the user asks to edit by name (without ID), prefer using "edit_invitee_by_name" so the server handles search + disambiguation deterministically.
 
 Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
         tools: {
@@ -156,6 +157,85 @@ Keep responses relatively brief and let the Tool Calls do the heavy lifting.`,
 
                     revalidatePath('/dashboard', 'layout');
                     return { success: true, message: `Updated invitee ${id} with new data.` };
+                },
+            }),
+
+            edit_invitee_by_name: tool({
+                description: 'Update/edit an existing invitee by name. Use this when user does not provide ID. The server will search and safely handle not-found/multiple matches.',
+                parameters: z.object({
+                    name: z.string().describe('The full or partial name to search for.'),
+                    full_name: z.string().optional(),
+                    display_name: z.string().optional(),
+                    phone: z.string().optional(),
+                    instagram: z.string().optional(),
+                    max_pax: z.number().optional(),
+                }).refine((value) => {
+                    const hasAnyUpdate = ['full_name', 'display_name', 'phone', 'instagram', 'max_pax']
+                        .some((key) => (value as any)[key] !== undefined);
+                    return hasAnyUpdate;
+                }, {
+                    message: 'At least one field must be provided for update.',
+                }),
+                execute: async ({ name, ...updates }: { name: string, full_name?: string, display_name?: string, phone?: string, instagram?: string, max_pax?: number }) => {
+                    const supabase = createSupabaseServerClient();
+
+                    let { data: matches, error: searchError } = await supabase
+                        .from('invitees')
+                        .select('id, full_name, display_name, phone, instagram')
+                        .ilike('full_name', `%${name}%`);
+
+                    if ((!matches || matches.length === 0) && name.includes(' ')) {
+                        const firstName = name.split(' ')[0];
+                        const fallback = await supabase
+                            .from('invitees')
+                            .select('id, full_name, display_name, phone, instagram')
+                            .ilike('full_name', `%${firstName}%`);
+                        matches = fallback.data;
+                        searchError = fallback.error;
+                    }
+
+                    if (searchError) {
+                        return { success: false, error: searchError.message };
+                    }
+
+                    const count = matches?.length || 0;
+                    if (count === 0) {
+                        return {
+                            success: false,
+                            reason: 'not_found',
+                            message: `No invitee found for name "${name}".`,
+                        };
+                    }
+
+                    if (count > 1) {
+                        return {
+                            success: false,
+                            reason: 'ambiguous',
+                            message: `Found ${count} invitees for "${name}". Please choose the exact person first.`,
+                            matches,
+                        };
+                    }
+
+                    const target = matches![0];
+                    const cleanUpdates = Object.fromEntries(
+                        Object.entries(updates).filter(([_, v]) => v !== undefined)
+                    );
+
+                    const { data: updated, error: updateError } = await supabase
+                        .from('invitees')
+                        .update({ ...cleanUpdates, updated_at: new Date().toISOString() })
+                        .eq('id', target.id)
+                        .select('id, full_name, display_name, phone, instagram, max_pax');
+
+                    if (updateError) return { success: false, error: updateError.message };
+                    if (!updated || updated.length === 0) return { success: false, error: 'Update failed: invitee not found during update step.' };
+
+                    revalidatePath('/dashboard', 'layout');
+                    return {
+                        success: true,
+                        message: `Updated invitee by name "${name}" successfully.`,
+                        updatedInvitee: updated[0],
+                    };
                 },
             }),
 

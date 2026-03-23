@@ -104,7 +104,7 @@ Assalamu'alaikum Warahmatullahi Wabarakatuh,
 
 Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i ${invitee.display_name || invitee.full_name} untuk menghadiri acara pernikahan kami:
 
-*Rahma Yus Nissa, S.Pt (Nissa)*
+*Rahma Yus Nissa, S.Pt (Ica)*
 Putri ke-4 dari Bapak (alm) H. Yusmin RB & Ibu Betmawati
 &
 *Afdal Rahmadhani (Afdal)*
@@ -139,7 +139,7 @@ Wassalamu'alaikum Warahmatullahi Wabarakatuh.`)
 
 Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i ${invitee.display_name || invitee.full_name} untuk menghadiri acara pernikahan kami:
 
-👰 Rahma Yus Nissa, S.Pt (Nissa)
+👰 Rahma Yus Nissa, S.Pt (Ica)
 Putri ke-4 dari Bapak (alm) H. Yusmin RB & Ibu Betmawati
 &
 🤵 Afdal Rahmadhani (Afdal)

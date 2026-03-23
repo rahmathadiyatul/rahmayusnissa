@@ -84,21 +84,49 @@ export default function ChatAssistant() {
                         )}
 
                         {/* Tool Invocations Badge */}
-                        {m.toolInvocations?.map(toolInvocation => (
-                            <div key={toolInvocation.toolCallId} className="bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.3)] text-[var(--accent-gold-dark)] text-xs px-3 py-1.5 rounded mt-2 flex items-center gap-2 max-w-[90%]">
-                                {('result' in toolInvocation) ? (
-                                    <>
-                                        <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                                        <span>Completed: <b>{toolInvocation.toolName}</b></span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[var(--accent-gold-dark)]"></div>
-                                        <span>Running: <b>{toolInvocation.toolName}</b>...</span>
-                                    </>
-                                )}
-                            </div>
-                        ))}
+                        {m.toolInvocations?.map(toolInvocation => {
+                            const hasResult = 'result' in toolInvocation;
+                            const result = hasResult ? (toolInvocation.result as any) : null;
+                            const isFailed = Boolean(
+                                hasResult &&
+                                result &&
+                                typeof result === 'object' &&
+                                (
+                                    result.success === false ||
+                                    typeof result.error === 'string' ||
+                                    typeof result.reason === 'string'
+                                )
+                            );
+
+                            const badgeClass = !hasResult
+                                ? 'bg-[rgba(212,175,55,0.1)] border-[rgba(212,175,55,0.3)] text-[var(--accent-gold-dark)]'
+                                : isFailed
+                                    ? 'bg-red-50 border-red-200 text-red-700'
+                                    : 'bg-green-50 border-green-200 text-green-700';
+
+                            return (
+                                <div key={toolInvocation.toolCallId} className={`border text-xs px-3 py-1.5 rounded mt-2 flex items-center gap-2 max-w-[90%] ${badgeClass}`}>
+                                    {hasResult ? (
+                                        isFailed ? (
+                                            <>
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                <span>Failed: <b>{toolInvocation.toolName}</b></span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+                                                <span>Success: <b>{toolInvocation.toolName}</b></span>
+                                            </>
+                                        )
+                                    ) : (
+                                        <>
+                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+                                            <span>Running: <b>{toolInvocation.toolName}</b>...</span>
+                                        </>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 ))}
 

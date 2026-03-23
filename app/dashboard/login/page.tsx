@@ -2,18 +2,16 @@
 
 import { useState } from 'react'
 import { login } from '@/app/actions/auth'
+import SubmitButton from './submit-button'
 
 export default function LoginPage() {
     const [error, setError] = useState<string | null>(null)
-    const [isPending, setIsPending] = useState(false)
 
     async function handleSubmit(formData: FormData) {
-        setIsPending(true)
         setError(null)
         const res = await login(formData)
         if (res?.error) {
             setError(res.error)
-            setIsPending(false)
         }
     }
 
@@ -35,13 +33,7 @@ export default function LoginPage() {
                             />
                         </div>
                         {error && <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg border border-red-100">{error}</p>}
-                        <button
-                            type="submit"
-                            disabled={isPending}
-                            className="font-display w-full bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.4)] text-[var(--accent-gold-dark)] py-3.5 rounded-full text-xs tracking-[0.25em] hover:bg-[rgba(212,175,55,0.2)] transition-colors disabled:opacity-50 mt-2 font-bold"
-                        >
-                            {isPending ? 'AUTHENTICATING...' : 'ENTER DASHBOARD'}
-                        </button>
+                        <SubmitButton />
                     </form>
                 </div>
             </div>

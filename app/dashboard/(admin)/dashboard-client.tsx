@@ -89,7 +89,14 @@ export default function DashboardClient({ initialInvitees }: { initialInvitees: 
 
     const getWaLink = (invitee: InviteeRow) => {
         if (!invitee.phone) return '#'
-        const phone = invitee.phone.startsWith('0') ? '62' + invitee.phone.slice(1) : invitee.phone
+
+        // Normalize phone number: remove all non-numeric characters (spaces, +, -, etc)
+        let phone = invitee.phone.replace(/\D/g, '')
+        // Convert leading 0 to 62 (Indonesia country code)
+        if (phone.startsWith('0')) {
+            phone = '62' + phone.slice(1)
+        }
+
         const isSent = invitee.is_sent
         let icon = "wa"
         const text = encodeURIComponent(`

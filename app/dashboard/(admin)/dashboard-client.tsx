@@ -13,15 +13,20 @@ import {
 export default function DashboardClient({ initialInvitees }: { initialInvitees: InviteeRow[] }) {
     const [invitees, setInvitees] = useState(initialInvitees)
     const [search, setSearch] = useState('')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'sent' | 'unsent'>('all')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingInvitee, setEditingInvitee] = useState<InviteeRow | null>(null)
 
     const filteredInvitees = useMemo(() => {
-        return invitees.filter(inv =>
-            inv.full_name.toLowerCase().includes(search.toLowerCase()) ||
-            (inv.display_name && inv.display_name.toLowerCase().includes(search.toLowerCase()))
-        )
-    }, [invitees, search])
+        return invitees.filter(inv => {
+            const matchesSearch = inv.full_name.toLowerCase().includes(search.toLowerCase()) ||
+                (inv.display_name && inv.display_name.toLowerCase().includes(search.toLowerCase()))
+
+            const matchesStatus = statusFilter === 'all' ? true : (statusFilter === 'sent' ? inv.is_sent : !inv.is_sent)
+
+            return matchesSearch && matchesStatus
+        })
+    }, [invitees, search, statusFilter])
 
     const handleToggleSent = async (id: string, currentStatus: boolean) => {
         // Optimistic update
@@ -175,15 +180,24 @@ Wassalamu'alaikum Warahmatullahi Wabarakatuh.`
         <div className="space-y-8">
             {/* Top Bar */}
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center sm:sticky sm:top-16 bg-[#f8f9fa] py-4 z-10">
-                <div className="relative w-full sm:max-w-xs">
+                <div className="relative w-full sm:max-w-xs flex items-center gap-2">
                     <input
                         type="text"
                         placeholder="Search by name..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="w-full bg-white border border-gray-200 shadow-sm rounded-full pl-11 pr-4 py-3 text-base text-gray-800 focus:outline-none focus:border-[rgba(212,175,55,0.5)] focus:ring-1 focus:ring-[rgba(212,175,55,0.5)] transition-all"
+                        className="flex-1 bg-white border border-gray-200 shadow-sm rounded-full pl-11 pr-4 py-3 text-base text-gray-800 focus:outline-none focus:border-[rgba(212,175,55,0.5)] focus:ring-1 focus:ring-[rgba(212,175,55,0.5)] transition-all"
                     />
                     <svg className="w-5 h-5 text-gray-400 absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+
+                    <select
+                        value={statusFilter}
+                        onChange={e => setStatusFilter(e.target.value as 'all' | 'sent' | 'unsent')}
+                        className="bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-700 focus:outline-none">
+                        <option value="all">Semua</option>
+                        <option value="sent">Terkirim</option>
+                        <option value="unsent">Belum</option>
+                    </select>
                 </div>
                 <div className="flex gap-3 w-full sm:w-auto">
                     <button

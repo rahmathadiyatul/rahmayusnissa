@@ -95,7 +95,7 @@ export default function DashboardClient({ initialInvitees }: { initialInvitees: 
         const text = encodeURIComponent(`
 Assalamu'alaikum Warahmatullahi Wabarakatuh,
 
-Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i [Nama Invitee] untuk menghadiri acara pernikahan kami:
+Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i ${invitee.display_name || invitee.full_name} untuk menghadiri acara pernikahan kami:
 
 *Rahma Yus Nissa, S.Pt (Nissa)*
 Putri ke-4 dari Bapak (alm) H. Yusmin RB & Ibu Betmawati
@@ -118,6 +118,11 @@ Merupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk
 Terima kasih banyak atas perhatian dan doa restunya.
 
 Wassalamu'alaikum Warahmatullahi Wabarakatuh.`)
+
+        // Force standard WhatsApp on Android (avoids opening WhatsApp Business)
+        if (typeof navigator !== 'undefined' && /android/i.test(navigator.userAgent)) {
+            return `intent://send?phone=${phone}&text=${text}#Intent;package=com.whatsapp;scheme=whatsapp;end`
+        }
 
         return `https://wa.me/${phone}?text=${text}`
     }

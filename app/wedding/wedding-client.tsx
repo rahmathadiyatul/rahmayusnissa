@@ -76,9 +76,11 @@ export default function WeddingClient({
     const [rsvpPax, setRsvpPax] = useState("1");
     const [attendance, setAttendance] = useState<AttendanceStatus>("hadir");
     const [rsvpStatus, setRsvpStatus] = useState("");
+    const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false);
 
     const [wishName, setWishName] = useState("");
     const [wishMessage, setWishMessage] = useState("");
+    const [isSubmittingWish, setIsSubmittingWish] = useState(false);
     const [wishes, setWishes] = useState<Wish[]>(
         initialWishes.length > 0
             ? initialWishes
@@ -97,6 +99,7 @@ export default function WeddingClient({
     const [giftSender, setGiftSender] = useState("");
     const [giftAmount, setGiftAmount] = useState("");
     const [giftStatus, setGiftStatus] = useState("");
+    const [isSubmittingGift, setIsSubmittingGift] = useState(false);
     const [copied, setCopied] = useState(false);
 
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -182,6 +185,7 @@ export default function WeddingClient({
         }
 
         setRsvpStatus("Menyimpan RSVP...");
+        setIsSubmittingRsvp(true);
 
         try {
             const res = await fetch("/api/rsvp", {
@@ -207,6 +211,8 @@ export default function WeddingClient({
             setAttendance("hadir");
         } catch {
             setRsvpStatus("Tidak dapat terhubung ke server saat ini.");
+        } finally {
+            setIsSubmittingRsvp(false);
         }
     };
 
@@ -216,6 +222,7 @@ export default function WeddingClient({
             return;
         }
 
+        setIsSubmittingWish(true);
         try {
             const res = await fetch("/api/wishes", {
                 method: "POST",
@@ -239,6 +246,8 @@ export default function WeddingClient({
             setWishMessage("");
         } catch {
             // Ignore transport errors in UI for now to keep flow simple.
+        } finally {
+            setIsSubmittingWish(false);
         }
     };
 
@@ -250,6 +259,7 @@ export default function WeddingClient({
         }
 
         setGiftStatus("Menyimpan konfirmasi...");
+        setIsSubmittingGift(true);
         try {
             const res = await fetch("/api/gift-confirmations", {
                 method: "POST",
@@ -272,6 +282,8 @@ export default function WeddingClient({
             setGiftAmount("");
         } catch {
             setGiftStatus("Tidak dapat terhubung ke server saat ini.");
+        } finally {
+            setIsSubmittingGift(false);
         }
     };
 
@@ -617,9 +629,20 @@ export default function WeddingClient({
 
                         <button
                             type="submit"
-                            className="font-display mt-4 w-full rounded-full border border-[rgba(212,175,55,0.6)] bg-[rgba(212,175,55,0.15)] px-6 py-4 text-xs tracking-[0.25em] text-[var(--accent-gold)] transition hover:bg-[rgba(212,175,55,0.25)] hover:scale-[1.01]"
+                            disabled={isSubmittingRsvp}
+                            className="font-display mt-4 flex w-full items-center justify-center rounded-full border border-[rgba(212,175,55,0.6)] bg-[rgba(212,175,55,0.15)] px-6 py-4 text-xs tracking-[0.25em] text-[var(--accent-gold)] transition hover:bg-[rgba(212,175,55,0.25)] hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
                         >
-                            KIRIM RSVP
+                            {isSubmittingRsvp ? (
+                                <>
+                                    <svg className="mr-3 h-4 w-4 animate-spin text-[var(--accent-gold)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    MENGIRIM...
+                                </>
+                            ) : (
+                                "KIRIM RSVP"
+                            )}
                         </button>
 
                         {rsvpStatus && <p className="text-center text-sm text-[var(--accent-gold)] mt-4 p-3 bg-[rgba(212,175,55,0.1)] rounded-lg border border-[rgba(212,175,55,0.2)]">{rsvpStatus}</p>}
@@ -692,9 +715,20 @@ export default function WeddingClient({
                         </div>
                         <button
                             type="submit"
-                            className="font-display w-full rounded-full border border-[rgba(212,175,55,0.5)] bg-[rgba(212,175,55,0.1)] px-6 py-4 text-center text-xs tracking-[0.25em] text-[var(--accent-gold)] transition hover:bg-[rgba(212,175,55,0.2)]"
+                            disabled={isSubmittingGift}
+                            className="font-display flex w-full items-center justify-center rounded-full border border-[rgba(212,175,55,0.5)] bg-[rgba(212,175,55,0.1)] px-6 py-4 text-center text-xs tracking-[0.25em] text-[var(--accent-gold)] transition hover:bg-[rgba(212,175,55,0.2)] hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
                         >
-                            KIRIM KONFIRMASI
+                            {isSubmittingGift ? (
+                                <>
+                                    <svg className="mr-3 h-4 w-4 animate-spin text-[var(--accent-gold)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    MENGIRIM...
+                                </>
+                            ) : (
+                                "KIRIM KONFIRMASI"
+                            )}
                         </button>
                         {giftStatus && <p className="text-center text-sm text-[var(--accent-gold)] mt-4 p-3 bg-[rgba(212,175,55,0.1)] rounded-lg border border-[rgba(212,175,55,0.2)]">{giftStatus}</p>}
                     </form>
@@ -720,9 +754,20 @@ export default function WeddingClient({
                         />
                         <button
                             type="submit"
-                            className="font-display w-full rounded-full border border-[rgba(184,188,198,0.4)] bg-[rgba(184,188,198,0.05)] px-6 py-4 text-xs tracking-[0.25em] silver-text transition hover:bg-[rgba(184,188,198,0.15)] hover:text-white"
+                            disabled={isSubmittingWish}
+                            className="font-display flex w-full items-center justify-center rounded-full border border-[rgba(184,188,198,0.4)] bg-[rgba(184,188,198,0.05)] px-6 py-4 text-xs tracking-[0.25em] silver-text transition hover:bg-[rgba(184,188,198,0.15)] hover:text-white disabled:cursor-not-allowed disabled:opacity-70 hover:scale-[1.01] disabled:hover:scale-100"
                         >
-                            KIRIM UCAPAN
+                            {isSubmittingWish ? (
+                                <>
+                                    <svg className="mr-3 h-4 w-4 animate-spin text-[var(--text-muted)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    MENGIRIM...
+                                </>
+                            ) : (
+                                "KIRIM UCAPAN"
+                            )}
                         </button>
                     </form>
 
